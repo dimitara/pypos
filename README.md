@@ -9,10 +9,10 @@ Following options are already available:
 
 * different roles
 
-- kitchen
-- service (waiters)
-- bar
-- manager
+  - kitchen
+  - service (waiters)
+  - bar
+  - manager
 
 * different UI applications for the different roles
 

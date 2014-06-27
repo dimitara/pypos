@@ -1,3 +1,5 @@
 venv
+deployment
 *.pyc
 .DS_Store
+deploy.sh
