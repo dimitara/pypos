@@ -1,0 +1,145 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular-resource.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular-route.min.js"></script>
+        
+        <script src="/static/js/app.js"></script>
+        <link rel="stylesheet" href="/static/css/font.css" />
+        <link rel="stylesheet" href="/static/css/app.css" />
+    </head>
+    <body>
+        <div ng-app="POSApp" class="dashboard">
+            <div>
+                <div ng-controller="OrderCtrl" ng-show="selectedOrder" class="current-order">
+                    <h3 class="add-table">+</h3>
+                    <h3>
+                        {[order.tableName]}
+                    </h3> 
+                    <ul class="order-items">
+                       <li ng-repeat="item in order.items">
+                            <span>{[item.name]}</span><span>{[item.quantity]} x <em>{[item.price]}</em></span>
+                       </li> 
+                    </ul>
+                    <ul class="order-actions">
+                        <li class="disabled">
+                            <span class="icon-tag"></span>
+                        </li>
+                        <li ng-click="pay()" ng-class="getClass('pay')">
+                            <span class="icon-banknote"></span>
+                        </li>
+                        <li ng-click="sendToKitchen()" ng-class="getClass('sendTo')">
+                            <span class="icon-paperplane"></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="container">
+                <div class="products" ng-controller="ProductsCtrl">
+                    <ul>
+                       <li ng-click="chooseProduct(product)" ng-repeat="product in products | orderBy:predicate:asc" class="{[product.categoryNeatName]}">
+                            <span class="title">{[product.name]}</span>
+                            <span class="desc">{[product.description]}</span>
+                       </li>  
+                    </ul>
+                </div>
+                
+                <div class="categories" ng-controller="CategoriesCtrl">
+                    <div class="settings">
+                        <em class="icon-settings" ng-click="openSettings()"></em>
+                    </div>
+                    <ul>
+                       <li ng-repeat="category in categories | orderBy:'order'" class="{[category.neatName]}">
+                            {[category.order]}. {[category.name]}
+                       </li> 
+                    </ul>
+                </div>
+            </div>
+            <div class="tables" ng-show="showTables" ng-controller="TablesCtrl">
+                <h2 ng-click="toggleTables()">Маси</h2>    
+                <ul>
+                   <li ng-repeat="table in tables | orderBy:'number'" ng-class="getClass(table)" ng-click="chooseTable(table)">
+                        {[table.nickname]}
+                   </li> 
+                </ul>
+            </div>
+            <div class="popup" ng-show="showPopup" ng-controller="PopupCtrl">
+                <div class="popup-inner">
+                    <p>Поръчката е изпратена успешно</p>
+                    <div>
+                        <div class="total">
+                            Изберете опция да продължите
+                        </div>
+                    </div>
+                    <ul>
+                        <li ng-click="back()">
+                            Обранто в поръчка
+                        </li>
+                        <li ng-click="chooseTable()">
+                            Избор на маса
+                        </li>
+                        <li ng-click="logout()">
+                            Изход
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="popup" ng-show="showPopup" ng-controller="InvoiceCtrl">
+                <div class="invoice popup-inner">
+                    <p>Приключване на сметка</p>
+                    <div>
+                        <!--
+                        <ul>
+                            <li ng-repeat="">
+                            </li>
+                        </ul>
+                        -->
+                        <div class="total">
+                            <span>Общо</span>
+                            <span>{[total]} лв.</span>
+                        </div>
+                    </div>
+                    <ul>
+                        <li ng-click="back()">
+                            Обранто в поръчка
+                        </li>
+                        <li ng-click="pay()">
+                            Плащане сметка
+                        </li>
+                        <li ng-click="logout()">
+                            Изход
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="popup" ng-show="showPopup" ng-controller="OptionsCtrl">
+                <div class="popup-inner">
+                    <p>Настройки</p>
+                    <div>
+                        <div class="total">
+                            <a href="">Отчет за деня</a>
+                        </div>
+                    </div>
+                    <ul>
+                        <li ng-click="exit()">
+                            Изход
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="popup" ng-show="showPopup" ng-controller="PINCtrl">
+                <div class="pin popup-inner">
+                    <div>
+                        <input type="password" placeholder="Въведете ПИН..."/>
+                    </div>
+                    <ul>
+                        <li ng-click="login()">
+                            Вход
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+

@@ -1,0 +1,177 @@
+<html>
+    <head>
+        <script src="/static/js/libs/angular.min.js"></script>
+        <script src="/static/js/libs/angular-resource.min.js"></script>
+        <script src="/static/js/libs/angular-ui-router.js"></script>
+        
+        <script src="/static/js/libs/angular-idle.min.js"></script>
+        <script src="/static/js/fastclick.js"></script>
+
+        <script src="/static/js/auth.js"></script>
+        <script src="/static/js/libs/iscroll-lite.js"></script>
+        
+        <script src="/static/js/app.js"></script>
+
+        <link rel="stylesheet" href="/static/css/font.css" />
+        <link rel="stylesheet" href="/static/css/pos-common.css" />
+        <link rel="stylesheet" href="/static/css/app.css" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    </head>
+    <body>
+        <div ng-app="POSApp" class="dashboard">
+            <div ng-controller="ApplicationController">
+                <div>
+                    <div ng-controller="OrderController" ng-show="showOrder" class="current-order">
+                        <h3 class="add-table">+</h3>
+                        <h3>
+                            {[currentOrder.table.nickname]}
+                        </h3> 
+                        <div id="order-items" ng-controller="OrderItemController" class="oi-container">
+                            <ul class="order-items">
+                               <li ng-repeat="item in currentOrder.orderItems" ng-click="selectItem(item)" ng-class="getClass(item)">
+                                    <span ng-click="putComment(item)" class="order-item-name">{[item.product.name]}</span><span ng-click="reduce(item)" >{[item.quantity]} x <em>{[item.product.price]}</em></span>
+                               </li> 
+                            </ul>
+                        </div>
+                        <div class="total">
+                            <span>Сума: {[money(currentOrder.total)]} лв.</span>
+                        </div>
+                        <ul class="order-actions">
+                            <li class="disabled" style="display:none">
+                                <span class="icon-tag"></span>
+                            </li>
+                            <li ng-click="pay()" ng-class="getClass('pay')">
+                                <span class="icon-banknote"></span>
+                            </li>
+                            <li ng-click="sendNewOrderItems()" ng-class="getClass('sendTo')">
+                                <span class="icon-paperplane"></span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="container">
+                    <div id="products" class="products" ng-controller="ProductController">
+                        <ul>
+                            <li ng-click="selectProduct(product)" ng-repeat="product in filteredProducts | orderBy:predicate:asc" class="{[product.categoryNeatName]}">
+                                <span class="title">{[product.name]}</span>
+                                <span class="desc">{[product.description]}</span>
+                            </li>  
+                        </ul>
+                    </div>
+                    
+                    <div class="categories" ng-controller="CategoryController">
+                        <ul>
+                            <li ng-click="filter()" class="all">
+                                Всички
+                            </li>
+                            <li ng-repeat="category in categories.list | orderBy:'order'" class="{[category.neatName]}" ng-click="filter(category)">
+                                {[category.name]}
+                            </li> 
+                        </ul>
+                    </div>
+                </div>
+                <div class="tables" ng-show="showTables" ng-controller="TableController">
+                    <div ng-hide="showTables">
+                        <h2 ng-click="toggleTables()">Маси</h2>
+                    </div>
+                    <div ng-show="showTables">
+                        <h2 ng-click="lock()">Изход</h2>
+                        <h2 ng-click="reports()">Отчети</h2>
+                    </div>
+                    <ul>
+                       <li ng-repeat="table in tables.list | orderBy:'number'" ng-class="getClass(table)"  ng-click="selectTable(table)">
+                            {[table.nickname]}
+                       </li> 
+                    </ul>
+                </div>
+                <div class="popup" ng-show="showPopup" ng-controller="PopupController">
+                    <div class="popup-inner" ng-show="orderSent">
+                        <p>Поръчката е изпратена успешно</p>
+                        <div>
+                            <div class="total">
+                                Изберете опция да продължите
+                            </div>
+                        </div>
+                        <ul>
+                            <li ng-click="back()">
+                                Обранто в поръчка
+                            </li>
+                            <li ng-click="chooseTable()">
+                                Избор на маса
+                            </li>
+                            <li ng-click="lock()">
+                                Изход
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="invoice popup-inner" ng-show="orderClosed">
+                        <form handle-touch-submit name="payForm" ng-submit="payOrder(details)" novalidate>
+                            <p>Приключване на сметка</p>
+                            <div>
+                                <ul>
+                                    <li ng-repeat="item in orderItems">
+                                        {[item..product.name]} 
+                                    </li>
+                                </ul>
+                                <div class="total">
+                                    <span>Отстъпка</span>
+                                    <input type="number" class="discount" placeholder="%" ng-change="discount(details)" ng-model="details.discount" />
+                                </div>
+                                <div class="total">
+                                    <input type="checkbox" id="f" ng-model="details.f" /> <label for="фиск"></label>
+                                </div>
+                                <div class="total">
+                                    <span>Общо</span>
+                                    <span>{[money(currentOrder.d_total)]} лв.</span>
+                                </div>
+                            </div>
+                            <ul>
+                                <li ng-click="back()">
+                                    <a>Обратно в поръчка</a>
+                                </li>
+                                <li>
+                                    <input type="submit" value="Плащане" />
+                                </li>
+                                <li ng-click="lock()">
+                                    <a>Изход</a>
+                                </li>
+                            </ul>
+                        </form>
+                    </div>
+                    <div class="popup-inner" ng-show="settingsOpened">
+                        <p>Настройки</p>
+                        <div>
+                            <div class="total">
+                                <a href="">Отчет за деня</a>
+                            </div>
+                        </div>
+                        <ul>
+                            <li ng-click="exit()">
+                                Изход
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="pin popup-inner" ng-show="pinRequested">
+                        <div>
+                            <form handle-touch-submit name="pinForm" ng-submit="pin(credentials)" novalidate>
+                                <input type="password" placeholder="ПИН КОД" ng-model="credentials.pin" />
+
+                                <input type="submit" value="Вход" />
+                            </form>
+                        </div>
+                    </div>
+                    <div class="comment popup-inner" ng-show="itemComment">
+                        <div>
+                            <form handle-touch-submit name="commentForm" ng-submit="putComment(comment)" novalidate>
+                                <input type="text" placeholder="Коментар към поръчка" ng-model="comment.text" />
+
+                                <input type="submit" value="Запази" />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

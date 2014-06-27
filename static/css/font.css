@@ -1,0 +1,76 @@
+@font-face {
+	font-family: 'icomoon';
+	src:url('../icomoon/fonts/icomoon.eot?poc4ol');
+	src:url('../icomoon/fonts/icomoon.eot?#iefixpoc4ol') format('embedded-opentype'),
+		url('../icomoon/fonts/icomoon.woff?poc4ol') format('woff'),
+		url('../icomoon/fonts/icomoon.ttf?poc4ol') format('truetype'),
+		url('../icomoon/fonts/icomoon.svg?poc4ol#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+	font-family: 'icomoon';
+	speak: none;
+	font-style: normal;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+
+	/* Better Font Rendering =========== */
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-trash:before {
+	content: "\e600";
+}
+.icon-key:before {
+	content: "\e601";
+}
+.icon-search:before {
+	content: "\e602";
+}
+.icon-settings:before {
+	content: "\e603";
+}
+.icon-tag:before {
+	content: "\e604";
+}
+.icon-lock:before {
+	content: "\e605";
+}
+.icon-bulb:before {
+	content: "\e606";
+}
+.icon-bubble:before {
+	content: "\e607";
+}
+.icon-stack:before {
+	content: "\e608";
+}
+.icon-cup:before {
+	content: "\e609";
+}
+.icon-note:before {
+	content: "\e60a";
+}
+.icon-paperplane:before {
+	content: "\e60b";
+}
+.icon-banknote:before {
+	content: "\e60c";
+}
+.icon-megaphone:before {
+	content: "\e60d";
+}
+.icon-food:before {
+	content: "\e60e";
+}
+.icon-clip:before {
+	content: "\e60f";
+}
+.icon-calendar:before {
+	content: "\e610";
+}

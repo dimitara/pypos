@@ -1,0 +1,38 @@
+<html ng-app="POSApp">
+    <head>
+        <title>POS Auth</title>
+        <script src="/static/js/libs/angular.min.js"></script>
+        <script src="/static/js/libs/angular-resource.min.js"></script>
+        <script src="/static/js/libs/angular-ui-router.js"></script>
+        
+        <script src="/static/js/libs/angular-idle.min.js"></script>
+        <script src="/static/js/fastclick.js"></script>
+        
+        <script src="/static/js/auth.js"></script>
+        <link rel="stylesheet" href="/static/css/font.css" />
+        <link rel="stylesheet" href="/static/css/pos-common.css" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    </head>
+    <body ng-controller="ApplicationController">
+        <div class="dashboard" ng-controller="LoginController">
+            <div class="popup">
+                <div class="popup-inner">
+                    <strong class="title">Login</strong>
+                    <form name="loginForm" ng-submit="login(credentials)" novalidate>
+                        <div>
+                            <input placeholder="username" type="text" id="username" ng-model="credentials.username">
+                        </div>
+                        <div>
+                            <input placeholder="password" type="password" id="password" ng-model="credentials.password">
+                        </div>
+                        <div>
+                            <button type="submit">Login</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+

@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <script src="/static/js/libs/angular.min.js"></script>
+        <script src="/static/js/libs/angular-resource.min.js"></script>
+        <script src="/static/js/libs/angular-ui-router.js"></script>
+        
+        <script src="/static/js/libs/angular-idle.min.js"></script>
+        <script src="/static/js/fastclick.js"></script>
+
+        <script src="/static/js/auth.js"></script>
+        <script src="/static/js/libs/iscroll-lite.js"></script>
+        
+        <script src="/static/js/app-kitchen.js"></script>
+
+        <link rel="stylesheet" href="/static/css/font.css" />
+        <link rel="stylesheet" href="/static/css/pos-common.css" />
+        <link rel="stylesheet" href="/static/css/app.css" />
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    </head>
+    <body>
+        <div ng-app="POSApp" class="dashboard">
+            <div ng-controller="OrderItemController">
+                <ul>
+                    <li ng-repeat="item in allOrderItems.list">
+                        {[item.id]} / {[item.productName]}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>

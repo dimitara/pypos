@@ -1,0 +1,163 @@
+<html ng-app="POSApp">
+    <head>
+        <title>POS Login</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular-resource.min.js"></script>
+        <!--<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.8/angular-route.min.js"></script>-->
+        <script src="//angular-ui.github.io/ui-router/release/angular-ui-router.js"></script>
+        
+        <script src="/static/js/test_app.js"></script>
+        <link rel="stylesheet" href="/static/css/font.css" />
+        <!--<link rel="stylesheet" href="/static/css/app.css" />-->
+        <style>
+            .box{
+                width:200px;
+                float:left;
+                height:200px;
+                overflow-y: scroll;
+            }
+        </style>
+    </head>
+    <body ng-controller="ApplicationController">
+        <div class="dashboard" ng-controller="LoginController">
+            <strong>Login</strong>
+            <form name="loginForm" ng-submit="login(credentials)" novalidate>
+                <div>
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" ng-model="credentials.username">
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" ng-model="credentials.password">
+                </div>
+                <div>
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+
+            <button type="button" ng-click="signOut()">Sign out</button>
+
+            <form name="pinForm" ng-submit="pin(credentials)" novalidate>
+                <div>
+                    <label for="pin">Pin:</label>
+                    <input type="text" id="pin" ng-model="credentials.pin">
+                </div>
+                <div>
+                    <button type="submit">Unlock</button>
+                </div>
+            </form>
+
+            <button type="button" ng-click="lock()">Lock</button>
+        </div>
+        <div ng-if="currentUser">Welcome, {[ currentUser.name ]}</div>
+        <div ng-if="isAuthorized(userRoles.admin)">You're admin.</div>
+
+        <ul>
+            <li ng-repeat="user in users.list">
+                {[user.username]}
+            </li>
+        </ul>
+
+        <div class="box tables" ng-controller="TablesController">
+            <h3>Tables</h3>
+            <ul>
+               <li ng-repeat="table in tables.list" ng-click="selectTable(table)">
+                    {[table.nickname]}
+               </li>  
+            </ul>
+        </div>
+
+        <div class="box categories" ng-controller="CategoryController">
+            <h3>Categories</h3>
+            <ul>
+               <li ng-repeat="category in categories.list">
+                    {[category.name]}
+               </li>  
+            </ul>
+        </div>
+
+        <div class="box products" ng-controller="ProductController">
+            <h3>Products</h3>
+            <ul>
+               <li ng-repeat="product in products.list" ng-click="selectProduct(product)">
+                    {[product.name]}
+               </li>  
+            </ul>
+        </div>
+
+        <div class="box orders" ng-controller="OrderController">
+            <h3>Orders</h3>
+            <ul>
+               <li ng-repeat="order in orders.list" ng-click="setOrder(order)" >
+                    {[order.tableId]} / {[order.total]}
+               </li>  
+            </ul>
+            <strong>Create order</strong>
+            <form name="orderForm" ng-submit="add(order)" novalidate>
+                <div>
+                    <label for="table">Table</label>
+                    <input type="text" id="table" ng-model="order.tableId">
+                </div>
+                <div>
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="box orderitems" ng-controller="OrderItemsController">
+            <h3>Order Items</h3>
+            <h4>Table {[currentOrder.tableId]}</h4>
+
+            <ul>
+                <li ng-repeat="item in currentOrderItems">
+                    <span ng-click="remove(item)">X</span><span ng-click="reduce(item)">-</span>{[item.productName]} | {[item.quantity]} | {[item.quantity*item.product.price]} лв.
+                </li>
+            </ul>
+
+            <input type="button" value="Send Order" ng-click="sendNewOrderItems()" ng-if="hasNewOrderItems" />
+            
+            <form name="orderCloseForm" ng-submit="close(order)" novalidate ng-if="noNewOrderItems">
+                <input type="number" ng-model="order.discount" placeholder="%" />
+                <input type="checkbox" ng-model="order.fis" />
+                <input type="submit" value="Close Order" />
+            </form>
+
+            <form name="orderItemForm" ng-submit="add(orderItem)" novalidate>
+                <div>
+                    <label for="table">Product</label>
+                    <input type="text" id="product" ng-model="orderItem.productId">
+                </div>
+                <div>
+                    <label for="password">Quantity</label>
+                    <input type="number" id="quantity" ng-model="orderItem.quantity">
+                </div>
+                <div>
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+<!--
+            <ul>
+               <li ng-repeat="order in orders.list">
+                    {[order.tableId]} / {[order.total]}
+               </li>  
+            </ul>
+            <strong>Create order</strong>
+            <form name="orderForm" ng-submit="add(order)" novalidate>
+                <div>
+                    <label for="table">Table</label>
+                    <input type="text" id="table" ng-model="order.tableId">
+                </div>
+                <div>
+                    <label for="password">Total</label>
+                    <input type="number" id="total" ng-model="order.total">
+                </div>
+                <div>
+                    <button type="submit">Add</button>
+                </div>
+            </form>
+-->
+        </div>
+
+    </body>
+</html>
+
