@@ -1,4 +1,4 @@
-app.factory('TableService', function ($http, Session, $q) {
+app.factory('TableService', function ($http, Session, $q, $rootScope, APP_EVENTS, UserService) {
     var tableService = {};
     tableService.list = [];
 
@@ -8,9 +8,18 @@ app.factory('TableService', function ($http, Session, $q) {
         }
     }
 
+    tableService.getByParentId = function(id){
+        for(var i=0; i<tableService.list.length; i++){
+            if(tableService.list[i].parentId === id) return tableService.list[i];
+        }
+    }
+
     tableService.get = function(){
         return $http.get('/tables/').then(function(response){
             tableService.list = response.data.results;
+            if(UserService.current){
+                $rootScope.$broadcast(APP_EVENTS.tablesReady);
+            }   
         });
     };
 
@@ -30,13 +39,15 @@ app.factory('TableService', function ($http, Session, $q) {
     return tableService;
 });
 
-app.factory('CategoryService', function ($http, Session, $q) {
+app.factory('CategoryService', function ($http, Session, $q, $rootScope, APP_EVENTS) {
     var categoryService = {};
     categoryService.list = [];
 
     categoryService.get = function(){
         return $http.get('/categories/').then(function(response){
             categoryService.list = response.data.results;
+
+            $rootScope.$broadcast(APP_EVENTS.categoryReady);
         });
     };
 
@@ -78,8 +89,12 @@ app.factory('OrderService', function ($http, Session, $rootScope, $q, APP_EVENTS
             o.total = 0;
             
             OrderItemService.list.forEach(function(oi){
-                if(oi.orderId === o.id){
+                var d = new Date();
+                if(oi.orderId === o.id && oi.quantity > 0){
                     o.orderItems.push(oi);
+                    if(!oi.changed) oi.since = 0;
+                    else oi.since = Math.round((d.getTime() - Date.parse(oi.changed)));
+                    
                     o.total += oi.product.price*oi.quantity;
                     if(!oi.sent) o.hasNewItems = true;
                 }
@@ -93,22 +108,23 @@ app.factory('OrderService', function ($http, Session, $rootScope, $q, APP_EVENTS
             orderService.all = response.data.results;
 
             bindOrderItems();
+            if(UserService.current){
+                orderService.list = orderService.list.filter(function(os){
+                    return os.operatedById === UserService.current.id;
+                });
 
-            orderService.list = orderService.list.filter(function(os){
-                return os.operatedById === UserService.current;
-            });
+                $rootScope.$broadcast(APP_EVENTS.ordersReady);
 
-            $rootScope.$broadcast(APP_EVENTS.ordersReady);
-
-            if(tableId){
-                $rootScope.$broadcast(APP_EVENTS.orderSelected, orderService.getByTableId(tableId));
+                if(tableId){
+                    $rootScope.$broadcast(APP_EVENTS.orderSelected, orderService.getByTableId(tableId));
+                }
             }
         });
     };
 
     orderService.save = function(order){
-        order.openedBy = window.location.origin + "/users/" + UserService.current + "/";
-        order.operatedBy = window.location.origin + "/users/" + UserService.current + "/";
+        order.openedBy = window.location.origin + "/users/" + UserService.current.id + "/";
+        order.operatedBy = window.location.origin + "/users/" + UserService.current.id + "/";
         order.table = window.location.origin + "/tables/" + order.tableId + "/";
     
         return $http.put('/orders/' + order.id + '/', order).then(function(response){
@@ -120,8 +136,8 @@ app.factory('OrderService', function ($http, Session, $rootScope, $q, APP_EVENTS
     };
 
     orderService.add = function(order){
-        order.openedBy = window.location.origin + "/users/" + UserService.current + "/";
-        order.operatedBy = window.location.origin + "/users/" + UserService.current + "/";
+        order.openedBy = window.location.origin + "/users/" + UserService.current.id + "/";
+        order.operatedBy = window.location.origin + "/users/" + UserService.current.id + "/";
         order.table = window.location.origin + "/tables/" + order.tableId + "/";
 
         return $http.post('/orders/', order).then(function(response){
@@ -157,6 +173,12 @@ app.factory('OrderItemService', function ($http, $rootScope, Session, $q, APP_EV
     };
 
     orderItemService.save = function(orderItem, skipOrderUpdate){
+        orderItem.product = window.location.origin + "/products/" + orderItem.productId + "/";
+        if(!orderItem.id){
+            orderItemService.add(orderItem);  
+            return ;
+        } 
+
         return $http.put('/orderitem/' + orderItem.id + "/", orderItem).then(function(response){
             if(!skipOrderUpdate) orderItemService.get();
             
@@ -192,6 +214,7 @@ app.factory('OrderItemService', function ($http, $rootScope, Session, $q, APP_EV
 app.controller('TableController', function($scope, $rootScope, AUTH_EVENTS, APP_EVENTS, TableService, OrderService, UserService){
     $scope.showTables = false;
     $scope.tables = TableService;
+    $scope.filteredTables = [];
 
     $scope.currentTable = void 0;
 
@@ -227,11 +250,35 @@ app.controller('TableController', function($scope, $rootScope, AUTH_EVENTS, APP_
         return className;
     };
 
-    $rootScope.$on(AUTH_EVENTS.userReady, function(){
-        $scope.showTables = true;    
+    function refreshTable(){
+        $scope.filteredTables = [];
+
+        for(var i=0; i<$scope.tables.list.length; i++){
+            if(!$scope.tables.list[i].parent || $scope.tables.list[i].parent && $scope.tables.list[i].taken){
+                $scope.filteredTables.push($scope.tables.list[i]);
+            }
+        }
+    }
+
+    $rootScope.$on(APP_EVENTS.createSubOrder, function(args, table){
+        $scope.selectTable(table);
+
+        refreshTable();
     });
 
-    $rootScope.$on(AUTH_EVENTS.usersInit, function(){
+    $rootScope.$broadcast(APP_EVENTS.tablesReady, function(){
+        if(UserService.current) refreshTable();
+    });
+
+    $rootScope.$on(AUTH_EVENTS.userReady, function(){
+        $scope.showTables = true;    
+
+        $scope.user = UserService.current.name;
+
+        refreshTable();
+    });
+
+    $rootScope.$on(AUTH_EVENTS.usersInit, function(args){
         TableService.get();
     });
 
@@ -248,11 +295,18 @@ app.controller('TableController', function($scope, $rootScope, AUTH_EVENTS, APP_
 
 app.controller('CategoryController', function($scope, $rootScope, AUTH_EVENTS, APP_EVENTS, CategoryService){
     $scope.categories = CategoryService;
+    $scope.scroll = void 0;
     $scope.filter = function(category){
         $rootScope.$broadcast(APP_EVENTS.categoryChanged, category ? category.id : void 0);
     };
     $rootScope.$on(AUTH_EVENTS.usersInit, function(){
         CategoryService.get();
+    });
+
+    $rootScope.$on(AUTH_EVENTS.categoryReady, function(){
+        setTimeout(function(){
+            $scope.scroll = new IScroll("#category", {click: true});
+        }, 1000);
     });
 });
 
@@ -263,7 +317,7 @@ app.controller('ProductController', function($scope, $rootScope, AUTH_EVENTS, AP
     $scope.scroll = void 0;
 
     $scope.selectProduct = function(product){
-        $rootScope.$broadcast(APP_EVENTS.productSelected, product.id);
+        $rootScope.$broadcast(APP_EVENTS.productSelected, product);
     };
 
     $rootScope.$on(AUTH_EVENTS.usersInit, function(){
@@ -271,10 +325,16 @@ app.controller('ProductController', function($scope, $rootScope, AUTH_EVENTS, AP
     });
 
     $rootScope.$on(APP_EVENTS.productsReady, function(){
-        $scope.filteredProducts = $scope.products.list;
+        $scope.filteredProducts = [];
+        
+        $scope.products.list.forEach(function(p){
+            if(p.available){
+                $scope.filteredProducts.push(p);
+            }
+        });
 
         setTimeout(function(){
-            $scope.scroll = new IScroll("#products");
+            $scope.scroll = new IScroll("#products", {click: true});
         }, 1000);
     });
 
@@ -283,9 +343,11 @@ app.controller('ProductController', function($scope, $rootScope, AUTH_EVENTS, AP
         else{
             $scope.filteredProducts = [];
             $scope.products.list.forEach(function(p){
-                if(p.categoryId === id) $scope.filteredProducts.push(p);
+                if(p.categoryId === id && p.available) $scope.filteredProducts.push(p);
             });
         }
+
+        if($scope.scroll){ setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 200); }
     });
 });
 
@@ -299,7 +361,7 @@ app.controller('OrderController', function($scope, $rootScope, AUTH_EVENTS, APP_
         OrderService.get();
     });
 
-    $scope.scroll = new IScroll("#order-items");
+    $scope.scroll = new IScroll("#order-items", {click: true});
 
     $scope.add = function(order){
         order.tableId = order.tableId;
@@ -338,6 +400,11 @@ app.controller('OrderController', function($scope, $rootScope, AUTH_EVENTS, APP_
         return "";
     };
 
+    $scope.createSubOrder = function(order){
+        var table = TableService.getByParentId(order.tableId);
+        if(table) $rootScope.$broadcast(APP_EVENTS.createSubOrder, table);
+    };
+
     $rootScope.$on(APP_EVENTS.openTables, function(){
         $scope.showOrder = false;
         $scope.currentOrder = void 0;
@@ -357,7 +424,7 @@ app.controller('OrderController', function($scope, $rootScope, AUTH_EVENTS, APP_
     $rootScope.$on(APP_EVENTS.tableSelected, function(args, id){
         var order = OrderService.getByTableId(id);
         if(order){
-            if(order.operatedById === UserService.current){
+            if(order.operatedById === UserService.current.id){
                 $scope.setOrder(order);
             }
             else{
@@ -368,8 +435,8 @@ app.controller('OrderController', function($scope, $rootScope, AUTH_EVENTS, APP_
         }
 
         var order = {};
-        order.openedBy = window.location.origin + "/users/" + UserService.current + "/";
-        order.operatedBy = window.location.origin + "/users/" + UserService.current + "/";
+        order.openedBy = window.location.origin + "/users/" + UserService.current.id + "/";
+        order.operatedBy = window.location.origin + "/users/" + UserService.current.id + "/";
         order.table = window.location.origin + "/tables/" + id + "/";
         order.tableId = id;
 
@@ -390,18 +457,42 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
 
     $scope.allOrderItems = OrderItemService;
 
+    $scope.newItems = [];
+
     $scope.add = function(orderItem){
         if(!$scope.currentOrder) return ;
 
         orderItem.order = window.location.origin + "/orders/" + $scope.currentOrder.id + "/";
         orderItem.product = window.location.origin + "/products/" + orderItem.productId + "/";
-        orderItem.addedBy = window.location.origin + "/users/" + UserService.current + "/";
+        orderItem.addedBy = window.location.origin + "/users/" + UserService.current.id + "/";
         orderItem.orderId = $scope.currentOrder.id;
+        orderItem.entered = Date.now();
+        orderItem.changed = new Date();
+        var d = new Date();
+        orderItem.since = (d.getTime() - orderItem.entered);
+        
+        $scope.currentOrder.orderItems.forEach(function(oi){
+            if(oi.entered){
+                oi.since = (d.getTime() - oi.entered);
+                if(isNaN(oi.since)) oi.since = 1000000000;
+            }
+        });
 
         $scope.hasNewOrderItems = true;
         $scope.noNewOrderItems = false;
+
+        $scope.newItems.push(orderItem);
+        $scope.currentOrder.orderItems.push(orderItem);
+        $scope.currentOrder.hasNewItems = true;
+
+        setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 300);
+        /*
+        var lastOrderItem = $scope.currentOrder.orderItems.filter(function(oi){
+            return oi.sent === false && oi.productId === orderItem.productId;
+        });
+
+        if(lastOrderItem && lastOrderItem.length > 0) lastOrderItem = lastOrderItem[0];
         
-        var lastOrderItem = $scope.currentOrder.orderItems[$scope.currentOrder.orderItems.length - 1];
         if(lastOrderItem && lastOrderItem.productId === parseInt(orderItem.productId) && !lastOrderItem.sent){
             lastOrderItem.quantity += orderItem.quantity;
 
@@ -411,8 +502,9 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
 
             return ;
         }
+        */
 
-        OrderItemService.add(orderItem);
+        //OrderItemService.add(orderItem);
     };
 
     $scope.remove = function(item){
@@ -428,9 +520,10 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
         if( item.quantity > 0 ){
             item.quantity--;
 
-            item.product = window.location.origin + "/products/" + item.productId + "/";
-            
-            OrderItemService.save(item);
+            if(item.id) OrderItemService.save(item);
+            else {
+                console.error($scope.newItems.indexOf(orderItem));
+            }
         }
     };
 
@@ -460,16 +553,21 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
     }
 
     $rootScope.$on(APP_EVENTS.commented, function(args, item){
-        if(item) item.sent = false;
+        if(item && !item.sent){
+            OrderItemService.save(item);
+        }
     });
 
     $rootScope.$on(APP_EVENTS.sendOrder, function(){
-        $scope.allOrderItems.list.forEach(function(item, i){
+        $scope.currentOrder.orderItems.forEach(function(item, i){
             if(!item.sent){
                 item.sent = true;
-                item.product = window.location.origin + "/products/" + item.productId + "/";
-                if(i === $scope.allOrderItems.list.length - 1) OrderItemService.save(item);
-                OrderItemService.save(item, true);
+                if(i === $scope.allOrderItems.list.length - 1){
+                    OrderItemService.save(item);  
+                } 
+                else{
+                    OrderItemService.save(item, true);
+                }
             }
         });
 
@@ -488,7 +586,7 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
             if($scope.currentOrder.tableId === item.tableId){
                 $scope.currentOrder = item; 
 
-                setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, $scope.scroll.maxScrollY, 0);}, 300);
+                setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 300);
             }
         });
     });
@@ -497,7 +595,7 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
         $scope.hasNewOrderItems = false;
         $scope.currentOrder = order;
 
-        setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, $scope.scroll.maxScrollY, 0);}, 300);
+        setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 300);
     });
 
     $rootScope.$on(APP_EVENTS.orderClosed, function(){
@@ -508,12 +606,14 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
     });
 
     $rootScope.$on(APP_EVENTS.orderItemsReady, function(){
-        setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, $scope.scroll.maxScrollY, 0);}, 300);
+        setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 300);
     });
 
-    $rootScope.$on(APP_EVENTS.productSelected, function(args, id){
+    $rootScope.$on(APP_EVENTS.productSelected, function(args, product){
         $scope.add({
-            productId: id,
+            productName: product.name,
+            productPrice: product.price,
+            productId: product.id,
             quantity: 1
         });
     });
@@ -526,7 +626,8 @@ app.controller('PopupController', function($scope, $rootScope, Session, AUTH_EVE
     $scope.settingsOpened = false;
     $scope.pinRequested = true;
     $scope.itemComment = false;
-    
+    $scope.comment = {text: ""};
+
     $scope.back = function(){
         $scope.showPopup = false;
     };
@@ -559,18 +660,23 @@ app.controller('PopupController', function($scope, $rootScope, Session, AUTH_EVE
             $scope.showPopup = false;
             $scope.itemComment = false;
 
-            $rootScope.$broadcast(APP_EVENTS.commented, $scope.currentItem);
-
             $scope.currentItem = void 0;
         }
 
-        $scope.currentItem.wastedReason = comment.text;
+        $scope.currentItem.comment = comment.text;
 
         $scope.showPopup = false;
         $scope.itemComment = false;
 
         $rootScope.$broadcast(APP_EVENTS.commented, $scope.currentItem);
         
+        $scope.currentItem = void 0;
+    };
+
+    $scope.cancelComment = function(){
+        $scope.showPopup = false;
+        $scope.itemComment = false;
+
         $scope.currentItem = void 0;
     };
 
@@ -596,7 +702,7 @@ app.controller('PopupController', function($scope, $rootScope, Session, AUTH_EVE
     $rootScope.$on(APP_EVENTS.comment, function(args, item){
         $scope.showPopup = true;
         $scope.itemComment = true;
-
+        $scope.comment = item.comment;
         $scope.currentItem = item;
     });
 });

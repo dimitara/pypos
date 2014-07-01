@@ -50,9 +50,8 @@ h3.add-table{
 
 .order-items li{
     display:block;
-    margin:5px 0 0 0;
+    margin:0;
     cursor:pointer;
-    padding:5px;
 }
 
 .order-items li.active{
@@ -62,6 +61,7 @@ h3.add-table{
 .order-items li span{
     display:inline-block;
     color:rgb(43,40,49);
+    padding:10px 5px 5px;
 }
 
 .order-items li.red span{
@@ -78,7 +78,7 @@ h3.add-table{
 
 .order-items li span:last-child{
     display:inline-block;
-    width:100px;
+    width:80px;
     height: 18px;
     vertical-align: top;
 }
@@ -96,6 +96,11 @@ h3.add-table{
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    background:rgba(43,40,49,0.1);
+}
+
+em.reduce-item{
+    background:rgba(43,40,49,0.1);
 }
 
 .current-order .total{
@@ -110,7 +115,7 @@ h3.add-table{
 .oi-container{
     position:static;
     width:100%;
-    height:470px;
+    height:280px;
     overflow: hidden;
 }
 
@@ -132,7 +137,7 @@ h3.add-table{
     
     margin:0;
     
-    width:40px;
+    width:60px;
     height:40px;
     line-height:40px;
 
@@ -165,10 +170,10 @@ h3.add-table{
 }
 
 .tables{
-    background: rgba(172,220,174,0.9);
+    background: rgba(172,220,174,1);
     position:absolute;
     width:100%;
-    height:300px;
+    height:420px;
     bottom:0;
     z-index:10;
 }
@@ -184,7 +189,7 @@ h3.add-table{
 }
 
 .tables.ng-hide{
-    bottom:-250px;
+    bottom:-370px;
     display:block !important;
 }
 
@@ -192,7 +197,7 @@ h3.add-table{
     display:none;
 }
 
-.tables h2{
+.tables h2, .tables h1{
     width:80px;
     float:right;
     clear:both;
@@ -208,11 +213,18 @@ h3.add-table{
     cursor:pointer;
 }
 
+.tables h1{
+    color:rgb(112,101,98);
+    background:transparent;
+    font-size: 20px;
+}
+
 .tables ul{
     list-style:none;
     width:85%;
     margin-left:5%;
     height:100%;
+    font-size: 0;
 }
 
 .tables li{
@@ -221,10 +233,9 @@ h3.add-table{
     line-height:100px;
 
     border-radius:50%;
-    float:left;
     text-align:center;
     vertical-align: middle;
-    margin:0 15px 15px 0;
+    margin:15px 5px 15px 0;
 
     background-color:white;
     background-image: linear-gradient(90deg, rgba(84,154,143,.5) 50%, transparent 50%),
@@ -234,6 +245,9 @@ h3.add-table{
 
     font-weight:bold;
     color: rgb(43,40,49);
+
+    display: inline-block;
+    font-size: 16px
 }
 
 .tables li.active{
@@ -334,7 +348,7 @@ input[type=checkbox]{
 }
 
 .pin, .comment{
-    margin-top:200px;
+    margin-top:20px;
     text-align:center;
 }
 
@@ -355,14 +369,19 @@ input[type=checkbox]{
     white-space:nowrap;
 }
 
-.products{
+.products, .category{
     display:inline-block;
     width:570px;
-    height:590px;
+    height:400px;
     overflow:hidden;
     margin-left:210px;
     font-size:0;
     vertical-align: top;
+}
+
+.category{
+    width:180px;
+    margin-left:0;
 }
 
 .categories{
@@ -379,10 +398,11 @@ input[type=checkbox]{
 
 .categories ul{
     width:100%;
-    height:100%;
+    height:auto;
     margin:10px 0;
     padding:0;
     list-style:none;
+    padding-bottom:50px;
 }
 
 .categories li{
@@ -427,6 +447,10 @@ input[type=checkbox]{
     color: rgba(43,40,49,0.8);
 }
 
+.products ul li.active{
+    opacity:0.7;
+}
+
 .products ul li span{
     display:block;
     width:100%;
@@ -455,7 +479,7 @@ input[type=checkbox]{
     color:rgba(43,40,49,0.7) !important;
 }
 
-.salads{
+.salads, .appetizer{
     background:rgb(160,202,160) !important;
     color:rgba(43,40,49,0.7) !important;
 }
@@ -465,17 +489,17 @@ input[type=checkbox]{
     color:#fff !important;
 }
 
-.skara{
+.grill{
     background:rgb(128,47,35) !important;
     color:#fff !important;
 }
 
-.desserts{
+.desserts, .bread{
     background:rgb(242,227,200) !important;
     color:rgb(84,154,143) !important;
 }
 
-.drinks{
+.drinks, .alc-free, .beer, .alcohol{
     background:rgb(245,212,142) !important;
     color:rgba(43,40,49,0.7) !important;
 }

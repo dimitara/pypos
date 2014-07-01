@@ -3,3 +3,4 @@ deployment
 *.pyc
 .DS_Store
 deploy.sh
+*.sqlite3

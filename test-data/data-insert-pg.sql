@@ -17,14 +17,18 @@ insert into pos_table (number, nickname, taken) values (8, 'Вапцаров', '
 insert into pos_table (number, nickname, taken) values (9, 'Далчев', 'F');
 insert into pos_table (number, nickname, taken) values (10, 'Талев', 'F');
 
-insert into pos_category (name, "neatName", "order") values ('Супи', 'soups', 1);
-insert into pos_category (name, "neatName", "order") values ('Салати', 'salads', 2);
-insert into pos_category (name, "neatName", "order") values ('Ястия', 'meals', 3);
-insert into pos_category (name, "neatName", "order") values ('Скара', 'drinks', 4);
-insert into pos_category (name, "neatName", "order") values ('Напитки', 'drinks', 5);
-insert into pos_category (name, "neatName", "order") values ('Десерти', 'desserts', 6);
-insert into pos_category (name, "neatName", "order") values ('Други', 'others', 7);
-insert into pos_category (name, "neatName", "order") values ('Специални', 'specials', 8);
+insert into pos_categoryType (name) values ('bar');
+insert into pos_categoryType (name) values ('kuh');
+insert into pos_categoryType (name) values ('ska');
+
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Супи', 'soups', 1, 2);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Салати', 'salads', 2, 2);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Ястия', 'meals', 3, 2);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Скара', 'drinks', 4, 3);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Напитки', 'drinks', 5, 1);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Десерти', 'desserts', 6, 2);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Други', 'others', 7, 2);
+insert into pos_category (name, "neatName", "order", "categoryType_id") values ('Специални', 'specials', 8, 2);
 
 insert into pos_product (name, description, category_id, price, "order", availability) values ('Рибена', '3 вида риба, люта', 1, 2.99, 1, -1);
 insert into pos_product (name, description, category_id, price, "order", availability) values ('Пилешка', 'застроена', 1, 2.99, 1, -1);

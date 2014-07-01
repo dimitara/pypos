@@ -95,3 +95,12 @@ def pos_op(request):
 
 def kitchen(request):
     return render(request, 'pos/kitchen.html')
+
+def skara(request):
+    return render(request, 'pos/grill.html')
+
+def bar(request):
+    return render(request, 'pos/bar.html')
+
+def report(request):
+    return render(request, 'pos/report.html')

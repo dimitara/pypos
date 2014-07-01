@@ -1,0 +1,104 @@
+.kitchen .dashboard{
+    width:100%;
+    height:100%;
+    background:white;
+}
+
+.kitchen ul{
+    list-style:none;
+    padding:0;
+    margin:0 10px;
+
+    font-size:0;
+}
+
+.kitchen h3{
+    margin:10px;
+}
+
+.kitchen li{
+    width:200px;
+    height:130px;
+    line-height:25px;
+    display:inline-block;
+
+    text-align:center;
+    margin:0 10px 10px 0;
+    padding:0;
+
+    border-radius:5px;
+    cursor:pointer;
+    font-size:0;
+    float:left;
+}
+
+.kitchen em{
+    display:inline-block;
+    font-style:normal;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.kitchen em:first-child{
+    width:190px;
+}
+
+.kitchen li:hover{
+    opacity:0.7;
+}
+
+.kitchen li span{
+    display:block;
+    font-size:20px;
+}
+
+.kitchen li span:first-child{
+    margin-top:15px;
+}
+
+.soups, .appetizer{
+    background:rgb(241,226,200) !important;
+    color:rgba(43,40,49,0.7) !important;
+}
+
+.salads{
+    background:rgb(160,202,160) !important;
+    color:rgba(43,40,49,0.7) !important;
+}
+
+.meals{
+    background:rgb(228,111,88) !important;
+    color:#fff !important;
+}
+
+.grill{
+    background:rgb(128,47,35) !important;
+    color:#fff !important;
+}
+
+.desserts{
+    background:rgb(242,227,200) !important;
+    color:rgb(84,154,143) !important;
+}
+
+.drinks, .alc-free, .alcohol, .beer{
+    background:rgb(245,212,142) !important;
+    color:rgba(43,40,49,0.7) !important;
+}
+
+.others{
+    background:rgb(241,226,200) !important;
+}
+
+.specials{
+    background:rgb(84,154,143) !important;
+}
+
+.comment{
+    width:100%;
+    color:red;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}

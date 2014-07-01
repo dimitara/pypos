@@ -70,14 +70,53 @@ app.factory('OrderItemService', function ($http, $rootScope, Session, $q, APP_EV
         });
     };
 
+    orderItemService.save = function(orderItem){
+        return $http.put('/orderitem/' + orderItem.id + "/", orderItem).then(function(response){
+        });
+    };
+
     return orderItemService;
 });
 
 app.controller('OrderItemController', function($scope, $rootScope, AUTH_EVENTS, APP_EVENTS, OrderItemService, ProductService, UserService){
     $scope.allOrderItems = OrderItemService;
+    $scope.orderItems = [];
+    var d = new Date();
+    var minutes = d.getMinutes().toString();
+    minutes = minutes.length === 1 ? "0" + minutes : minutes;
+
+    $scope.now = d.getHours() + ":" + minutes;
+
+    $scope.remove = function(item){
+        item.cooked = true;
+        OrderItemService.save(item);
+
+        for(var i=0; i<$scope.orderItems.length; i++){
+            if($scope.orderItems[i].id === item.id){
+                $scope.orderItems.splice(i, 1); 
+                break;
+            } 
+        }
+    }
 
     $rootScope.$on(AUTH_EVENTS.usersInit, function(){
         ProductService.get();
         OrderItemService.get();
+    });
+
+    $rootScope.$on(APP_EVENTS.orderItemsReady, function(){
+        $scope.orderItems = [];
+
+        $scope.allOrderItems.list.forEach(function(item){
+            if(item.quantity > 0 && item.sent && filter.indexOf(item.categoryType) > -1 && !item.cooked){
+                item.since = Math.round((d.getTime() - Date.parse(item.changed))/(1000*60));
+                var changed = new Date(item.changed);
+                
+                var minutes = changed.getMinutes();
+                minutes = minutes.length === 1 ? "0" + minutes : minutes;
+                item.last = changed.getHours() + ":" + minutes;
+                $scope.orderItems.push(item);  
+            } 
+        });
     });
 });

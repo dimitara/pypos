@@ -1,18 +1,33 @@
 # -*- coding: utf-8 -*- 
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.utils.timezone import utc
+import pytz
 
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
+
+try:
+    from printer import printOrder
+except:
+    pass
 
 class Employee(models.Model):
     user = models.OneToOneField(User)
     pin = models.CharField(max_length=10, unique=True)
     #role = models.
 
+    def _userId(self):
+        return self.user.id
+    userId = property(_userId)
+
     def _username(self):
         return self.user.username
     username = property(_username)
+
+    def _name(self):
+        return self.user.first_name
+    name = property(_name)
 
 class Table(models.Model):
     number = models.IntegerField()
@@ -21,6 +36,11 @@ class Table(models.Model):
     parent = models.ForeignKey("Table", blank=True, null=True)
     booked = models.DateField(blank=True, null=True)
 
+    def _parentId(self):
+        if self.parent is None: return None
+        return self.parent.id
+    parentId = property(_parentId)
+
     def __unicode__(self):
         return Table._meta.verbose_name + " " + str(self.number)
 
@@ -28,10 +48,22 @@ class Table(models.Model):
         verbose_name = u'Маса'
         verbose_name_plural = u'Маси'
 
+class CategoryType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u'Тип Категория'
+        verbose_name_plural = u'Тип Категории'
+
+
 class Category(models.Model):
     name = models.CharField(max_length=500)
     neatName = models.CharField(max_length=100)
     order = models.IntegerField()
+    categoryType = models.ForeignKey(CategoryType);
 
     def __unicode__(self):
         return self.name
@@ -49,6 +81,7 @@ class Product(models.Model):
     availability = models.IntegerField(default=0)
     availabilityUpdated = models.DateField(blank=True, null=True)
     order = models.IntegerField()
+    available = models.BooleanField(blank=True, default=True)
 
     def _categoryNeatName(self):
         return self.category.neatName
@@ -109,6 +142,11 @@ class Order(models.Model):
                 self.table.save()
                 self.closed = datetime.now()
 
+                try:
+                    printOrder(self, orderItems)
+                except Exception, err:
+                    print err
+
 
         super(Order, self).save(*args, **kwargs)
 
@@ -135,8 +173,10 @@ class OrderItem(models.Model):
     cooked = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
+        print self.addedBy
         if self.sent and not self.changed:
-            self.changed = datetime.now()
+            self.changed = datetime.utcnow().replace(tzinfo=utc)
+
         #self.operatedBy = self.openedBy
         super(OrderItem, self).save(*args, **kwargs)
 
@@ -151,6 +191,30 @@ class OrderItem(models.Model):
     def _productName(self):
         return self.product.name
     productName = property(_productName)
+
+    def _productDesc(self):
+        return self.product.description
+    productDesc = property(_productDesc)
+
+    def _productPrice(self):
+        return self.product.price
+    productPrice = property(_productPrice)
+
+    def _tableName(self):
+        return self.order.table.nickname
+    tableName = property(_tableName)
+
+    def _categoryType(self):
+        return self.product.category.categoryType.name
+    categoryType = property(_categoryType)
+
+    def _categoryNeatName(self):
+        return self.product.category.neatName
+    categoryNeatName = property(_categoryNeatName)
+
+    def _waiter(self):
+        return self.addedBy.first_name
+    waiter = property(_waiter)
 
     def __unicode__(self):
         retVal = self.order.table.nickname + " / " + self.product.name

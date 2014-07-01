@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>КУХНЯ</title>
+        <title>СКАРА</title>
         <script src="/static/js/libs/angular.min.js"></script>
         <script src="/static/js/libs/angular-resource.min.js"></script>
         <script src="/static/js/libs/angular-ui-router.js"></script>
@@ -10,7 +10,8 @@
 
         <script src="/static/js/auth.js"></script>
         <script src="/static/js/libs/iscroll-lite.js"></script>
-        <script>var filter = ['kuh', 'ska']</script>
+        
+        <script>var filter = ['ska']</script>
         <script src="/static/js/app-kitchen.js"></script>
 
         <link rel="stylesheet" href="/static/css/font.css" />
@@ -23,10 +24,10 @@
         <div ng-app="POSApp" class="dashboard">
             <div ng-controller="OrderItemController">
                 <div>
-                    <h3 style="font-size:28px"><span>ПОРЪЧКИ | КУХНЯ</span>   •   <span>{[now]}</span></h3>
+                    <h3 style="font-size:28px"><span>ПОРЪЧКИ | СКАРА</span> •  •  • <span>{[now]}</span></h3>
                 </div>
                 <ul>
-                    <li ng-repeat="item in orderItems | orderBy:'since':reverse" class="{[item.categoryNeatName]}" ng-click="remove(item)">
+                    <li ng-repeat="item in orderItems | orderBy:item.since:reverse" class="{[item.categoryNeatName]}" ng-click="remove(item)">
                         <span>{[item.tableName]} • {[item.waiter]}</span>
                         <span><em>{[item.productName]}</em></span>
                         <span><em>{[item.productDesc]}</em></span>

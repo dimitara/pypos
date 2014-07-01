@@ -1,5 +1,6 @@
 <html>
     <head>
+        <title>ПОС - ОПЕРАТОР</title>
         <script src="/static/js/libs/angular.min.js"></script>
         <script src="/static/js/libs/angular-resource.min.js"></script>
         <script src="/static/js/libs/angular-ui-router.js"></script>
@@ -23,14 +24,14 @@
             <div ng-controller="ApplicationController">
                 <div>
                     <div ng-controller="OrderController" ng-show="showOrder" class="current-order">
-                        <h3 class="add-table">+</h3>
+                        <h3 class="add-table" ng-click="createSubOrder(currentOrder)">+</h3>
                         <h3>
-                            {[currentOrder.table.nickname]}
+                            {[currentOrder.table.nickname]} 
                         </h3> 
                         <div id="order-items" ng-controller="OrderItemController" class="oi-container">
                             <ul class="order-items">
-                               <li ng-repeat="item in currentOrder.orderItems" ng-click="selectItem(item)" ng-class="getClass(item)">
-                                    <span ng-click="putComment(item)" class="order-item-name">{[item.product.name]}</span><span ng-click="reduce(item)" >{[item.quantity]} x <em>{[item.product.price]}</em></span>
+                               <li ng-repeat="item in currentOrder.orderItems | orderBy:'since':reverse" ng-click="selectItem(item)" ng-class="getClass(item)">
+                                    <span ng-click="putComment(item)" class="order-item-name">{[item.productName]}</span><span class="reduce-item" ng-click="reduce(item)" >{[item.quantity]} x <em>{[item.productPrice]}</em></span>
                                </li> 
                             </ul>
                         </div>
@@ -42,10 +43,10 @@
                                 <span class="icon-tag"></span>
                             </li>
                             <li ng-click="pay()" ng-class="getClass('pay')">
-                                <span class="icon-banknote"></span>
+                                <span >Пла</span>
                             </li>
                             <li ng-click="sendNewOrderItems()" ng-class="getClass('sendTo')">
-                                <span class="icon-paperplane"></span>
+                                <span >Кух</span>
                             </li>
                         </ul>
                     </div>
@@ -61,14 +62,16 @@
                     </div>
                     
                     <div class="categories" ng-controller="CategoryController">
-                        <ul>
-                            <li ng-click="filter()" class="all">
-                                Всички
-                            </li>
-                            <li ng-repeat="category in categories.list | orderBy:'order'" class="{[category.neatName]}" ng-click="filter(category)">
-                                {[category.name]}
-                            </li> 
-                        </ul>
+                        <div id="category" class="category">
+                            <ul>
+                                <li ng-click="filter()" class="all">
+                                    Всички
+                                </li>
+                                <li ng-repeat="category in categories.list | orderBy:'order'" class="{[category.neatName]}" ng-click="filter(category)">
+                                    {[category.name]}
+                                </li> 
+                            </ul>
+                        </div>
                     </div>
                 </div>
                 <div class="tables" ng-show="showTables" ng-controller="TableController">
@@ -78,9 +81,10 @@
                     <div ng-show="showTables">
                         <h2 ng-click="lock()">Изход</h2>
                         <h2 ng-click="reports()">Отчети</h2>
+                        <h1>{[user]}</h1>
                     </div>
                     <ul>
-                       <li ng-repeat="table in tables.list | orderBy:'number'" ng-class="getClass(table)"  ng-click="selectTable(table)">
+                       <li ng-repeat="table in filteredTables | orderBy:'number'" ng-class="getClass(table)"  ng-click="selectTable(table)">
                             {[table.nickname]}
                        </li> 
                     </ul>
@@ -110,8 +114,8 @@
                             <p>Приключване на сметка</p>
                             <div>
                                 <ul>
-                                    <li ng-repeat="item in orderItems">
-                                        {[item..product.name]} 
+                                    <li ng-repeat="item in orderItems | orderBy:changed">
+                                        {[item..productName]} 
                                     </li>
                                 </ul>
                                 <div class="total">
@@ -165,8 +169,14 @@
                         <div>
                             <form handle-touch-submit name="commentForm" ng-submit="putComment(comment)" novalidate>
                                 <input type="text" placeholder="Коментар към поръчка" ng-model="comment.text" />
-
-                                <input type="submit" value="Запази" />
+                                <ul>
+                                    <li>
+                                        <input type="submit" value="Запази" />
+                                    </li>
+                                    <li ng-click="cancelComment()">
+                                        <a>Отказ</a>
+                                    </li>
+                                </ul>
                             </form>
                         </div>
                     </div>

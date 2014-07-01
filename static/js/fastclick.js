@@ -373,6 +373,24 @@ FastClick.prototype.getTargetElementFromEventTarget = function(eventTarget) {
     return eventTarget;
 };
 
+/**
+ * On touch start, add active css class on the target element
+ *
+ * @param {EventTarget} targetElement
+ */
+FastClick.prototype.setActive = function(targetElement){
+    targetElement.classList.add("active");
+};
+
+/**
+ * On touch move, end or out, remove active css class on the target element
+ *
+ * @param {EventTarget} targetElement
+ */
+FastClick.prototype.removeActive = function(targetElement){
+    targetElement.classList.remove("active");
+};
+
 
 /**
  * On touch start, record the position and scroll offset.
@@ -424,6 +442,8 @@ FastClick.prototype.onTouchStart = function(event) {
         }
     }
 
+    this.setActive(targetElement);
+
     this.trackingClick = true;
     this.trackingClickStart = event.timeStamp;
     this.targetElement = targetElement;
@@ -472,6 +492,7 @@ FastClick.prototype.onTouchMove = function(event) {
 
     // If the touch has moved, cancel the click tracking
     if (this.targetElement !== this.getTargetElementFromEventTarget(event.target) || this.touchHasMoved(event)) {
+        this.removeActive(targetElement);
         this.trackingClick = false;
         this.targetElement = null;
     }
@@ -589,6 +610,8 @@ FastClick.prototype.onTouchEnd = function(event) {
         }
     }
 
+    this.removeActive(targetElement);
+
     // Prevent the actual click from going though - unless the target node is marked as requiring
     // real clicks or if it is in the whitelist in which case only non-programmatic clicks are permitted.
     if (!this.needsClick(targetElement)) {
@@ -607,6 +630,8 @@ FastClick.prototype.onTouchEnd = function(event) {
  */
 FastClick.prototype.onTouchCancel = function() {
     'use strict';
+    this.removeActive(targetElement);
+
     this.trackingClick = false;
     this.targetElement = null;
 };

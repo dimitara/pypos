@@ -65,12 +65,14 @@ app.constant('APP_EVENTS', {
     orderPaid: 'order-paid',
     sendOrder: 'send-order',
     payOrder: 'pay-order',
+    createSubOrder: 'create-sub-order',
     orderItemsReady: 'order-items-ready',
     orderItemSaved: 'order-item-saved',
     tableSelected: 'table-selected',
     tableTaken: 'table-taken',
     openTables: 'open-tables',
     categoryChanged: 'category-changed',
+    categoryReady: 'category-ready',
     productsReady: 'products-ready',
     productSelected: 'product-selected',
     comment: 'comment',
@@ -110,7 +112,6 @@ app.config(function ($httpProvider) {
 
 app.config(['$keepaliveProvider', '$idleProvider', function($keepaliveProvider, $idleProvider) {
     if(window.location.href.indexOf('kitchen') > -1){
-        console.error("XXXX");
         $idleProvider.idleDuration(10);
         $idleProvider.warningDuration(3);
     }
@@ -153,14 +154,19 @@ app.factory('UserService', function ($http, Session, $q, $rootScope, AUTH_EVENTS
     userService.get = function(){
         return $http.get('/employees/').then(function(response){
             userService.list = response.data.results;
-            $rootScope.$broadcast(AUTH_EVENTS.usersInit);
+            userService.list.forEach(function(u){
+                console.error(u.userId);
+                u.id = u.userId;
+            });
+
+            $rootScope.$broadcast(AUTH_EVENTS.usersInit, userService.list);
         });
     };
 
     userService.set = function(pin){
         userService.list.forEach(function(u){
             if(u.pin === pin){
-                userService.current = u.id;
+                userService.current = u;
             }
         });
         
@@ -279,16 +285,12 @@ app.controller('ApplicationController', function($scope, $rootScope, AUTH_EVENTS
         $scope.unlocked = true;
     });
 
-/*
     $rootScope.$on('$idleTimeout', function() {
-        console.error("XXX");
-        
-
         if(!$scope.unlocked) return ; 
         
         $scope.lock();
     });
-*/
+
     $idle.watch();
 });
 
@@ -350,8 +352,9 @@ app.run(function ($rootScope, AUTH_EVENTS, AuthService, UserService, Session, $i
 
     setTimeout(function(){
         if(window.location.pathname.indexOf('/kitchen') > -1) window.location.reload();
+        if(window.location.pathname.indexOf('/skara') > -1) window.location.reload();
+        if(window.location.pathname.indexOf('/bar') > -1) window.location.reload();
     }, 15000);
-
 
     FastClick.attach(document.body);
 
