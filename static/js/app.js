@@ -462,27 +462,38 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
     $scope.add = function(orderItem){
         if(!$scope.currentOrder) return ;
 
-        orderItem.order = window.location.origin + "/orders/" + $scope.currentOrder.id + "/";
-        orderItem.product = window.location.origin + "/products/" + orderItem.productId + "/";
-        orderItem.addedBy = window.location.origin + "/users/" + UserService.current.id + "/";
-        orderItem.orderId = $scope.currentOrder.id;
-        orderItem.entered = Date.now();
-        orderItem.changed = new Date();
-        var d = new Date();
-        orderItem.since = (d.getTime() - orderItem.entered);
-        
-        $scope.currentOrder.orderItems.forEach(function(oi){
-            if(oi.entered){
-                oi.since = (d.getTime() - oi.entered);
-                if(isNaN(oi.since)) oi.since = 1000000000;
-            }
+        var lastOrderItem = $scope.currentOrder.orderItems.filter(function(oi){
+            return oi.sent === false && oi.productId === orderItem.productId;
         });
+
+        if(lastOrderItem && lastOrderItem.length > 0){
+            lastOrderItem = lastOrderItem[0];
+            lastOrderItem.quantity++;
+        }
+        else{
+            orderItem.order = window.location.origin + "/orders/" + $scope.currentOrder.id + "/";
+            orderItem.product = window.location.origin + "/products/" + orderItem.productId + "/";
+            orderItem.addedBy = window.location.origin + "/users/" + UserService.current.id + "/";
+            orderItem.orderId = $scope.currentOrder.id;
+            orderItem.sent = false;
+            orderItem.entered = Date.now();
+            orderItem.changed = new Date();
+            var d = new Date();
+            orderItem.since = (d.getTime() - orderItem.entered);
+            
+            $scope.currentOrder.orderItems.forEach(function(oi){
+                if(oi.entered){
+                    oi.since = (d.getTime() - oi.entered);
+                    if(isNaN(oi.since)) oi.since = 1000000000;
+                }
+            });
+
+            $scope.newItems.push(orderItem);
+            $scope.currentOrder.orderItems.push(orderItem);
+        }
 
         $scope.hasNewOrderItems = true;
         $scope.noNewOrderItems = false;
-
-        $scope.newItems.push(orderItem);
-        $scope.currentOrder.orderItems.push(orderItem);
         $scope.currentOrder.hasNewItems = true;
 
         setTimeout(function(){$scope.scroll.refresh();$scope.scroll.scrollTo(0, 0, 0);}, 300);
@@ -517,12 +528,15 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
     };
 
     $scope.reduce = function(item){
-        if( item.quantity > 0 ){
-            item.quantity--;
+        var result = confirm("Да намалим ли бройката с 1?");
+        if(result){
+            if( item.quantity > 0 ){
+                item.quantity--;
 
-            if(item.id) OrderItemService.save(item);
-            else {
-                console.error($scope.newItems.indexOf(orderItem));
+                if(item.id) OrderItemService.save(item);
+                else {
+                
+                }
             }
         }
     };

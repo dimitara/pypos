@@ -159,7 +159,7 @@
                     <div class="pin popup-inner" ng-show="pinRequested">
                         <div>
                             <form handle-touch-submit name="pinForm" ng-submit="pin(credentials)" novalidate>
-                                <input type="password" placeholder="ПИН КОД" ng-model="credentials.pin" />
+                                <input type="number" placeholder="ПИН КОД" ng-model="credentials.pin" />
 
                                 <input type="submit" value="Вход" />
                             </form>

@@ -3,6 +3,36 @@ from serialEscPos import serialEscPos
 
 ser = serialEscPos()
 
+def printReport(waiter, total):
+    ser.doubleStrike(1)
+
+    ser.underline(1)
+
+    ser.centre()
+
+    ser.println(u'ОТЧЕТ'.encode('cp866', 'ignore'))
+
+    ser.println("")
+
+    ser.println(waiter.encode('cp866', 'ignore'))
+
+    ser.centre()
+
+    ser.underline(0)
+
+    ser.println("")
+    ser.println(str("{0:.2f}".format(total)) + u' лв.'.encode('cp866', 'ignore'))
+
+    ser.println("")
+
+    ser.println("")
+
+    ser.println("")
+    
+    ser.println("")
+
+    ser.cut();
+
 def printOrder(order, orderItems):
 
     ser.doubleStrike(1)

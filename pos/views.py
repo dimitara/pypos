@@ -12,9 +12,15 @@ from django import template
 from django.shortcuts import render, render_to_response
 from django.http import HttpResponse
 from django.db import models
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 
 from datetime import datetime, timedelta
+
+try:
+    from printer import printReport
+except:
+    pass
+
 
 """
 class AuthView(APIView):
@@ -118,7 +124,7 @@ def report(request):
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
 
     items = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to)
-    orderItems = items.values('product__name', 'product__description', 'product__price').annotate(dcount=Count('product__name'))
+    orderItems = items.values('product__name', 'product__description', 'product__price').annotate(dcount=Sum('quantity'))
     
     total = 0
     discounts = 0

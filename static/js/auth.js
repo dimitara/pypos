@@ -111,8 +111,8 @@ app.config(function ($httpProvider) {
 });
 
 app.config(['$keepaliveProvider', '$idleProvider', function($keepaliveProvider, $idleProvider) {
-    if(window.location.href.indexOf('kitchen') > -1){
-        $idleProvider.idleDuration(10);
+    if(window.location.href.indexOf('pos-op') > -1){
+        $idleProvider.idleDuration(30);
         $idleProvider.warningDuration(3);
     }
 }]);
@@ -155,7 +155,6 @@ app.factory('UserService', function ($http, Session, $q, $rootScope, AUTH_EVENTS
         return $http.get('/employees/').then(function(response){
             userService.list = response.data.results;
             userService.list.forEach(function(u){
-                console.error(u.userId);
                 u.id = u.userId;
             });
 
@@ -165,7 +164,7 @@ app.factory('UserService', function ($http, Session, $q, $rootScope, AUTH_EVENTS
 
     userService.set = function(pin){
         userService.list.forEach(function(u){
-            if(u.pin === pin){
+            if(u.pin === pin.toString()){
                 userService.current = u;
             }
         });
