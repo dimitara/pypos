@@ -36,7 +36,7 @@ urlpatterns = patterns('',
     url(r'^skara/', views.skara, name='skara'),    
     url(r'^bar/', views.bar, name='bar'),
     url(r'^admin/report/', views.report, name='report'),
-    url(r'^admin/report-service/', views.report, name='report'),
+    url(r'^report-service/', views.report_service, name='report_service'),
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),

@@ -33,7 +33,7 @@
                 width:600px;
             }
 
-            input{
+            input, select{
                 font-size:24px;
                 padding:5px;
             }
@@ -53,18 +53,46 @@
             }
         </style>
         <script>
-            function changeDate(){
+            function getReport(){
                 var d = new Date(Date.parse(document.getElementById('currentDate').value));
+                var d_param = "";
+                try{
+                    d_param = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();    
+                }
+                catch(e){d_param = null;}
+                if(d_param.indexOf('NaN') > -1) d_param = null;
+
+                var waiter = void 0;
+                try{
+                    waiter = document.getElementById('waiters').selectedOptions[0];    
+                }
+                catch(e){}
+                if(!waiter) {
+                    alert("Избери персонал");
+                    return ;
+                }
                 
-                var d_param = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
-                window.location.href = window.location.pathname + '?date=' + d_param;
+            var params = '?';
+            if(d_param){
+                params += 'date=' + d_param + "&";
+            }
+            params += "w=" + waiter.id;
+
+                window.location.href = window.location.pathname + params;
             }
         </script>
     </head>
     <body>
         <div>
             <div class="toolbar">
-                <span>Избери дата: </span><input id="currentDate" type="date" onchange="changeDate()" />
+                <span>Избери дата: </span><input id="currentDate" type="date" />
+                <span>Персонал: </span>
+                <select id="waiters">
+                    {% for w in waiters %}
+                        <option id="{{w.id}}">{{w.first_name}}</option>
+                    {% endfor %}
+                </select>
+                <input type="button" value="Отчет" onclick="getReport()" />
             </div>
             <h1>Отчет за деня: {{today}}</h1>
             <div class="orders">
@@ -110,39 +138,6 @@
                         Общо оборот за деня: <span>{{total}} лв</span>
                     </h3>
                 </div>
-            </div>
-            <div class="order-items">
-                <h3>
-                    Отчет по артикули
-                </h3>
-                <table>
-                    <tr>
-                        <tr>
-                            <th>
-                                Артикул
-                            </th>
-                            <th>
-                                Бройка
-                            </th>
-                            <th>
-                                Цена за бройка
-                            </th>
-                        </tr>
-                    </tr>
-                    {% for oi in orderItems %}
-                    <tr>
-                        <td>
-                            {{oi.product__name}} - {{oi.product__description}}
-                        </td>
-                        <td>
-                            {{oi.dcount}}
-                        </td>
-                        <td>
-                            {{oi.product__price}} лв.
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </table>
             </div>
 
             <div class="discount">
