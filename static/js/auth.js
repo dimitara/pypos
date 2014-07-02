@@ -172,6 +172,13 @@ app.factory('UserService', function ($http, Session, $q, $rootScope, AUTH_EVENTS
         return userService.current;
     };
 
+    userService.report = function(){
+        $http.get('/report-waiter/?w=' + userService.current.userId).then(function(response){
+            if(response.data && response.data.indexOf('error') > -1) alert("Имате незатворени сметки.");
+            if(response.data && response.data.indexOf('printer') > -1) alert("Има проблем с принтера.");
+        });
+    };
+
     return userService;
 });
 

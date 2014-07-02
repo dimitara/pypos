@@ -186,3 +186,39 @@ def report_service(request):
     })
 
     return render_to_response(['pos/report_service.html'], c)    
+
+def report_waiter(request):
+    w = None
+    
+    if request.GET.has_key('w'):    
+        w = request.GET['w']
+
+    if w == None: return render(request, 'pos/empty.html')
+
+    orders = models.get_model('pos', 'Order').objects.all()
+    orders = orders.filter(operatedBy=w).filter(reported=False)
+
+    waiter = models.get_model('auth', 'user').objects.all().get(id=int(w))    
+    
+    total = 0
+    for o in orders:
+        if o.status == False: 
+            return render(request, 'pos/error.html')
+        total += o.total
+
+    try:
+        printReport(waiter.first_name, total)
+    except Exception, err:
+        c = template.RequestContext(request, {
+            'error' : err
+        })
+
+        return render_to_response(['pos/print-error.html'], c)
+        pass
+
+    for o in orders:
+        o.reported = True
+        o.save()
+
+    return render(request, 'pos/empty.html')
+

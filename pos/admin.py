@@ -25,8 +25,10 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('__unicode__','total','discount','closed',)
+    list_display = ('__unicode__', 'openedBy', 'total','discount','closed', 'reported')
 
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('addedBy','product','quantity','tableName','changed',)
 
 # Define an inline admin descriptor for Employee model
 # which acts a bit like a singleton
@@ -48,4 +50,4 @@ admin.site.register(CategoryType, CategoryTypeAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Order, OrderAdmin)
-admin.site.register(OrderItem)
+admin.site.register(OrderItem, OrderItemAdmin)

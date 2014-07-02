@@ -14,7 +14,7 @@ def printReport(waiter, total):
 
     ser.println("")
 
-    ser.println(waiter.encode('cp866', 'ignore'))
+    ser.println(waiter.upper().encode('cp866', 'ignore'))
 
     ser.centre()
 

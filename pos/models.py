@@ -95,8 +95,8 @@ class Product(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = u'Продукт'
-        verbose_name_plural = u'Продукти'
+        verbose_name = u'Ястие'
+        verbose_name_plural = u'Ястия'
 
 class Order(models.Model):
     table = models.ForeignKey(Table)
@@ -129,23 +129,26 @@ class Order(models.Model):
 
         if self.id:
             orderItems = OrderItem.objects.filter(order__id=self.id)
-            
-            self.total = 0
-            for oi in orderItems:
-                self.total += oi.quantity*oi.product.price
+            if self.reported == True:
+                pass
+            else:
+                self.total = 0
+                for oi in orderItems:
+                    self.total += oi.quantity*oi.product.price
 
-            if self.discount > 0:
-                self.total -= self.total*(self.discount/100)
+                if self.discount > 0:
+                    self.total -= self.total*(self.discount/100)
 
-            if self.status:
-                self.table.taken = False
-                self.table.save()
-                self.closed = datetime.now()
+                if self.status:
+                    self.table.taken = False
+                    self.table.save()
 
-                try:
-                    printOrder(self, orderItems)
-                except Exception, err:
-                    print err
+                    self.closed = datetime.now()
+
+                    try:
+                        printOrder(self, orderItems)
+                    except:
+                        pass
 
 
         super(Order, self).save(*args, **kwargs)

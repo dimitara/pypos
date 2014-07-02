@@ -90,7 +90,7 @@ app.factory('OrderService', function ($http, Session, $rootScope, $q, APP_EVENTS
             
             OrderItemService.list.forEach(function(oi){
                 var d = new Date();
-                if(oi.orderId === o.id && oi.quantity > 0){
+                if(oi.orderId === o.id){
                     o.orderItems.push(oi);
                     if(!oi.changed) oi.since = 0;
                     else oi.since = Math.round((d.getTime() - Date.parse(oi.changed)));
@@ -259,6 +259,10 @@ app.controller('TableController', function($scope, $rootScope, AUTH_EVENTS, APP_
             }
         }
     }
+
+    $scope.report = function(){
+        UserService.report();
+    };
 
     $rootScope.$on(APP_EVENTS.createSubOrder, function(args, table){
         $scope.selectTable(table);
@@ -528,9 +532,9 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
     };
 
     $scope.reduce = function(item){
-        var result = confirm("Да намалим ли бройката с 1?");
-        if(result){
-            if( item.quantity > 0 ){
+        if( item.quantity > 0 ){
+            var result = confirm("Да намалим ли бройката с 1?");
+            if(result){
                 item.quantity--;
 
                 if(item.id) OrderItemService.save(item);
@@ -538,6 +542,11 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
                 
                 }
             }
+        }
+        else{
+            item.quantity++;
+
+            if(item.id) OrderItemService.save(item);
         }
     };
 
