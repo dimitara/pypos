@@ -488,7 +488,8 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
             
             $scope.currentOrder.orderItems.forEach(function(oi){
                 if(oi.entered){
-                    oi.since = (d.getTime() - oi.entered);
+                    var entered = new Date(oi.entered);
+                    oi.since = (d.getTime() - entered);
                     if(isNaN(oi.since)) oi.since = 1000000000;
                 }
             });
@@ -537,6 +538,8 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
             var result = confirm("Да намалим ли бройката с 1?");
             if(result){
                 item.quantity--;
+                if(!item.reduced) item.reduced = 0;
+                if(item.sent) item.reduced++;
 
                 if(item.id) OrderItemService.save(item);
                 else {
@@ -546,6 +549,7 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
         }
         else{
             item.quantity++;
+            if(item.reduced > 0 && item.sent) item.reduced--;
 
             if(item.id) OrderItemService.save(item);
         }

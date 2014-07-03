@@ -54,7 +54,7 @@
                 <div class="container">
                     <div id="products" class="products" ng-controller="ProductController">
                         <ul>
-                            <li ng-click="selectProduct(product)" ng-repeat="product in filteredProducts | orderBy:predicate:asc" class="{[product.categoryNeatName]}">
+                            <li ng-click="selectProduct(product)" ng-repeat="product in filteredProducts | orderBy:'order':asc" class="{[product.categoryNeatName]}">
                                 <span class="title">{[product.name]}</span>
                                 <span class="desc">{[product.description]}</span>
                             </li>  

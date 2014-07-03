@@ -61,7 +61,7 @@ class OrderItemSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ('id', 'orderId', 'order', 'productId', 'productName', 'productPrice', 'product', 'quantity', 'changed', 'wasted', 'wastedReason', 'addedBy', 'sent', 'tableName', 'categoryType', 'categoryNeatName', 'waiter', 'cooked', 'comment', 'entered', 'productDesc')
+        fields = ('id', 'orderId', 'order', 'productId', 'productName', 'productPrice', 'product', 'quantity', 'changed', 'wasted', 'wastedReason', 'addedBy', 'sent', 'tableName', 'categoryType', 'categoryNeatName', 'waiter', 'cooked', 'comment', 'entered', 'productDesc', 'reduced')
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
