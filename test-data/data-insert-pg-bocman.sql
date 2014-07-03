@@ -13,6 +13,7 @@ insert into pos_table (number, nickname, taken) values (9, 'Далчев', 'F');
 insert into pos_table (number, nickname, taken) values (10, 'Талев', 'F');
 insert into pos_table (number, nickname, taken) values (11, 'Лилиев', 'F');
 insert into pos_table (number, nickname, taken) values (12, 'Пасков', 'F');
+insert into pos_table (number, nickname, taken) values (13, 'Бар', 'F');
 
 insert into pos_categoryType (name) values ('bar');
 insert into pos_categoryType (name) values ('kuh');

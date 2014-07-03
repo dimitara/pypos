@@ -167,13 +167,14 @@ app.factory('OrderItemService', function ($http, $rootScope, Session, $q, APP_EV
     orderItemService.get = function(){
         return $http.get('/orderitem/').then(function(response){
             orderItemService.list = response.data.results;
-
+                
             $rootScope.$broadcast(APP_EVENTS.orderItemsReady);
         });
     };
 
     orderItemService.save = function(orderItem, skipOrderUpdate){
         orderItem.product = window.location.origin + "/products/" + orderItem.productId + "/";
+        orderItem.entered = new Date(orderItem.entered);
         if(!orderItem.id){
             orderItemService.add(orderItem);  
             return ;

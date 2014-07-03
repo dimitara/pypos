@@ -1,0 +1,1 @@
+ALTER TABLE pos_orderitem ADD COLUMN reduced int set default 0;

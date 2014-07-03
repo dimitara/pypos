@@ -42,7 +42,7 @@ class Table(models.Model):
     parentId = property(_parentId)
 
     def __unicode__(self):
-        return Table._meta.verbose_name + " " + str(self.number)
+        return Table._meta.verbose_name + " " + self.nickname
 
     class Meta:
         verbose_name = u'Маса'
@@ -164,8 +164,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order)
     product = models.ForeignKey(Product)
     quantity = models.PositiveIntegerField(default=1)
-    entered = models.DateTimeField(auto_now=True)
-    #processed = models.DateTimeField(blank=True, null=True)
+    entered = models.DateTimeField(blank=True, null=True)
     changed = models.DateTimeField(blank=True, null=True)
     wasted = models.BooleanField(default=False)
     wastedReason = models.CharField(max_length=500, blank=True, null=True)
@@ -174,9 +173,13 @@ class OrderItem(models.Model):
     sent = models.BooleanField(default=False)
     comment = models.CharField(max_length=500, blank=True, null=True)
     cooked = models.BooleanField(default=False)
+    reduced = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
-        print self.addedBy
+        if not self.id:
+            self.entered = datetime.utcnow().replace(tzinfo=utc)
+            pass
+
         if self.sent and not self.changed:
             self.changed = datetime.utcnow().replace(tzinfo=utc)
 

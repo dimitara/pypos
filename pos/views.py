@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*- 
 from django.contrib.auth.models import User, Group
 from pos.models import Table, Product, Category, Employee, Order, OrderItem
 
@@ -15,6 +16,7 @@ from django.db import models
 from django.db.models import Q, Count, Sum
 
 from datetime import datetime, timedelta
+import csv
 
 try:
     from printer import printReport
@@ -222,3 +224,49 @@ def report_waiter(request):
 
     return render(request, 'pos/empty.html')
 
+def report_csv(request):
+    d_from = datetime.now()
+    if request.GET.has_key('date'):
+        d_from = datetime.strptime(request.GET['date'], '%Y-%m-%d')
+
+    d_from = d_from + timedelta(hours=9)
+    d_to = d_from + timedelta(hours=24)
+
+    # Create the HttpResponse object with the appropriate CSV header.
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="report_quantities.csv"'
+
+    items = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to).order_by('product__name')
+    orderItems = items.values('product__name', 'product__description', 'product__price').annotate(dcount=Sum('quantity'))
+
+    writer = csv.writer(response)
+    writer.writerow([u'Item', u'Count', u'Price'])
+    
+    for oi in orderItems:
+        product = oi['product__name'].encode('utf-8', 'ignore') 
+        if oi['product__description'] != None and len(oi['product__description']) > 0:
+            product += '-' + oi['product__description'].encode('utf-8', 'ignore')
+        writer.writerow([product, oi['dcount'], oi['product__price']])
+
+    writer.writerow([u''])
+
+
+    orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
+        
+    total = 0
+    discounts = 0
+    for o in orders:
+        total += o.total
+        if o.discount > 0:
+            perc = (100-o.discount)
+            if perc == 0: perc = 1
+            discounts += o.total/perc - o.total
+
+    total2 = 0
+    for oi in items:
+        total2 += oi.quantity * oi.product.price
+
+    writer.writerow([u'Turnover', u'Discounts'])
+    writer.writerow([total, str("{0:.2f}".format(total2-total))])
+
+    return response
