@@ -97,7 +97,24 @@ app.controller('OrderItemController', function($scope, $rootScope, AUTH_EVENTS, 
                 break;
             } 
         }
-    }
+    };
+
+    $scope.getClass = function(item){
+        var cls = item.categoryNeatName;
+        if(item.reduced > 0){
+            cls += " reduced";
+        }
+
+        return cls;
+    };
+
+    $scope.getReduced = function(item){
+        if(item.reduced > 0){
+            return item.reduced + " / "
+        }
+
+        return "";
+    };
 
     $rootScope.$on(AUTH_EVENTS.usersInit, function(){
         ProductService.get();

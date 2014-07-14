@@ -310,7 +310,7 @@ app.controller('CategoryController', function($scope, $rootScope, AUTH_EVENTS, A
 
     $rootScope.$on(AUTH_EVENTS.categoryReady, function(){
         setTimeout(function(){
-            $scope.scroll = new IScroll("#category", {click: true});
+            $scope.scroll = new IScroll("#category", {click: true, mouseWheel: true});
         }, 1000);
     });
 });
@@ -339,7 +339,7 @@ app.controller('ProductController', function($scope, $rootScope, AUTH_EVENTS, AP
         });
 
         setTimeout(function(){
-            $scope.scroll = new IScroll("#products", {click: true});
+            $scope.scroll = new IScroll("#products", {click: true, mouseWheel: true});
         }, 1000);
     });
 
@@ -366,7 +366,7 @@ app.controller('OrderController', function($scope, $rootScope, AUTH_EVENTS, APP_
         OrderService.get();
     });
 
-    $scope.scroll = new IScroll("#order-items", {click: true});
+    $scope.scroll = new IScroll("#order-items", {click: true, mouseWheel: true});
 
     $scope.add = function(order){
         order.tableId = order.tableId;
@@ -582,7 +582,7 @@ app.controller('OrderItemController', function($scope, $rootScope, APP_EVENTS, O
 
     $rootScope.$on(APP_EVENTS.commented, function(args, item){
         if(item && !item.sent){
-            OrderItemService.save(item);
+            //OrderItemService.save(item);
         }
     });
 
@@ -728,9 +728,13 @@ app.controller('PopupController', function($scope, $rootScope, Session, AUTH_EVE
     });
 
     $rootScope.$on(APP_EVENTS.comment, function(args, item){
+        if(item.sent) {
+            alert("Изпратено е в кухнята.");
+            return ;
+        }
         $scope.showPopup = true;
         $scope.itemComment = true;
-        $scope.comment = item.comment;
+        $scope.comment = {text:item.comment};
         $scope.currentItem = item;
     });
 });

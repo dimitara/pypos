@@ -1,3 +1,8 @@
+body{
+    height:100%;
+    overflow-y:scroll;
+}
+
 .kitchen .dashboard{
     width:100%;
     height:100%;
@@ -87,7 +92,7 @@
     color:rgba(43,40,49,0.7) !important;
 }
 
-.others{
+.others, .bread{
     background:rgb(241,226,200) !important;
 }
 
@@ -101,4 +106,19 @@
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+}
+
+.reduced{
+    background:red !important;
+}
+
+.reduced .comment{
+    color:#fff;
+}
+
+.meals .comment{
+    color: rgb(43,40,49);
+}
+.specials .comment, .grill .comment{
+    color:rgb(245,212,142);   
 }

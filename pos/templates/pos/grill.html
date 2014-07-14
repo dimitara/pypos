@@ -20,19 +20,20 @@
 
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     </head>
+
     <body class="kitchen">
         <div ng-app="POSApp" class="dashboard">
             <div ng-controller="OrderItemController">
                 <div>
-                    <h3 style="font-size:28px"><span>ПОРЪЧКИ | СКАРА</span> •  •  • <span>{[now]}</span></h3>
+                    <h3 style="font-size:28px"><span>ПОРЪЧКИ | КУХНЯ</span>   •   <span>{[now]}</span></h3>
                 </div>
                 <ul>
-                    <li ng-repeat="item in orderItems | orderBy:item.since:reverse" class="{[item.categoryNeatName]}" ng-click="remove(item)">
+                    <li ng-repeat="item in orderItems | orderBy:'since':reverse" ng-class="getClass(item)" ng-click="remove(item)">
                         <span>{[item.tableName]} • {[item.waiter]}</span>
                         <span><em>{[item.productName]}</em></span>
                         <span><em>{[item.productDesc]}</em></span>
-                        <span><em>{[item.quantity]} броя</em></span>
-                        <span>{[item.since]} мин</span>
+                        <span><em class="comment">{[item.comment]}</em></span>                        
+                        <span><em>{[getReduced(item)]}{[item.quantity]} бр  •  {[item.since]} мин</em></span>
                     </li>
                 </ul>
             </div>
