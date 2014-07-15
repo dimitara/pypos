@@ -59,12 +59,20 @@
                 var d_param = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
                 window.location.href = window.location.pathname + '?date=' + d_param;
             }
+
+            function prepareDownloadLink(){
+                var href = '/admin/report-csv' + window.location.search;
+                document.getElementById('download-report').setAttribute("href", href)
+            }
         </script>
     </head>
-    <body>
+    <body onload="prepareDownloadLink()">
         <div>
             <div class="toolbar">
                 <span>Избери дата: </span><input id="currentDate" type="date" onchange="changeDate()" />
+            </div>
+            <div>
+                <a id="download-report" href="">Изтегли Отчет</a>
             </div>
             <h1>Отчет за деня: {{today}}</h1>
             <div class="orders">
