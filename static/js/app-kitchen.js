@@ -125,7 +125,7 @@ app.controller('OrderItemController', function($scope, $rootScope, AUTH_EVENTS, 
         $scope.orderItems = [];
 
         $scope.allOrderItems.list.forEach(function(item){
-            if(item.quantity > 0 && item.sent && filter.indexOf(item.categoryType) > -1 && !item.cooked){
+            if((item.quantity > 0 || item.reduced > 0) && item.sent && filter.indexOf(item.categoryType) > -1 && !item.cooked){
                 item.since = Math.round((d.getTime() - Date.parse(item.changed))/(1000*60));
                 var changed = new Date(item.changed);
                 
