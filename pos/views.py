@@ -125,6 +125,13 @@ def report(request):
     
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
 
+    total2 = 0
+    oitems = models.get_model('pos', 'OrderItem').objects.all();
+    for o in orders:
+        items = oitems.filter(order_id=o.id)
+        for oi in items:
+            total2 += oi.quantity * oi.product.price
+
     items = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to)
     orderItems = items.values('product__name', 'product__description', 'product__price').annotate(dcount=Sum('quantity'))
     
@@ -137,10 +144,8 @@ def report(request):
             if perc == 0: perc = 1
             discounts += o.total/perc - o.total
 
-    total2 = 0
-    for oi in items:
-        total2 += oi.quantity * oi.product.price
-
+    print total2, total
+    
     c = template.RequestContext(request, {
         'today' : d_from.strftime('%d-%m-%Y'),
         'orders' : orders,
@@ -164,7 +169,16 @@ def report_service(request):
     d_to = d_from + timedelta(hours=24)
     
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
-    orders = orders.filter(operatedBy=w)
+    orders = orders.filter(operatedBy=w).order_by('closed')
+
+    oitems = models.get_model('pos', 'OrderItem').objects.all();
+    for o in orders:
+        items = oitems.filter(order_id=o.id)
+        o.orderItems = items
+        o.total2 = 0
+        for oi in items:
+            o.total2 += oi.quantity * oi.product.price
+
 
     #orderItems = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to).values('product__name', 'product__price').annotate(dcount=Count('product__name'))
     

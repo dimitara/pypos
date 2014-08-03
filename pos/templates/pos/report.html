@@ -64,14 +64,30 @@
                 var href = '/admin/report-csv' + window.location.search;
                 document.getElementById('download-report').setAttribute("href", href)
             }
+
+            window.addEventListener('load', function(){
+                var params = window.location.search.replace('?', '').split('&');
+                
+                var date = params[0].replace('date=', '');
+                var date_parts = date.split('-');
+
+                var now = new Date();
+
+                var newDate = now.getFullYear() + "-" + ((now.getMonth()+1).toString().length === 1 ? "0" + (now.getMonth() + 1) : (now.getMonth() + 1)) + "-" + (now.getDate().toString().length === 1 ? "0" + now.getDate() : now.getDate())
+
+                try{
+                    newDate = date_parts[0] + "-" + (date_parts[1].length === 1 ? "0" + date_parts[1] : date_parts[1]) + "-" + (date_parts[2].length === 1 ? "0" + date_parts[2] : date_parts[2])
+                }
+                catch(e){}
+
+                document.getElementById('currentDate').value = newDate;                
+            });
         </script>
     </head>
     <body onload="prepareDownloadLink()">
         <div>
             <div class="toolbar">
                 <span>Избери дата: </span><input id="currentDate" type="date" onchange="changeDate()" />
-            </div>
-            <div>
                 <a id="download-report" href="">Изтегли Отчет</a>
             </div>
             <h1>Отчет за деня: {{today}}</h1>

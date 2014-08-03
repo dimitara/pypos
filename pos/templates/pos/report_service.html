@@ -1,6 +1,6 @@
 <html>
     <head>
-        <title>ОТЧЕТ ЗА ДЕНЯ</title>
+        <title>ОТЧЕТ ЗА ДЕНЯ ПО СЕРВИТЬОР</title>
         <script src="/static/js/libs/angular.min.js"></script>
         <script src="/static/js/libs/angular-resource.min.js"></script>
         <script src="/static/js/libs/angular-ui-router.js"></script>
@@ -17,11 +17,35 @@
             }
 
             .orders table{
-                width:800px;
+                width:1000px;
+            }
+
+            table{
+                border:solid 1px rgb(160,202,160);
             }
 
             table th{
                 text-align:left;
+                background:rgb(160,202,160);
+                padding:10px 5px;
+            }
+
+            table tr:nth-child(odd){
+                background:rgba(160,202,160,0.5);
+            }
+
+            table td{
+                vertical-align: top;
+                padding:5px;
+            }
+
+            table td ul{
+                margin:0;
+                padding:20px;
+            }
+
+            table td li{
+                margin:0;
             }
 
             .total span {
@@ -34,12 +58,12 @@
             }
 
             input, select{
-                font-size:24px;
+                font-size:18px;
                 padding:5px;
             }
 
             .toolbar span{
-                font-size:20px;
+                font-size:18px;
             }
 
             @media print {
@@ -72,14 +96,35 @@
                     return ;
                 }
                 
-            var params = '?';
-            if(d_param){
-                params += 'date=' + d_param + "&";
-            }
-            params += "w=" + waiter.id;
+                var params = '?';
+                if(d_param){
+                    params += 'date=' + d_param + "&";
+                }
+                params += "w=" + waiter.id;
 
                 window.location.href = window.location.pathname + params;
             }
+
+            window.addEventListener('load', function(){
+                var params = window.location.search.replace('?', '').split('&');
+                
+                var date = params[0].replace('date=', '');
+                var date_parts = date.split('-');
+                var newDate = date_parts[0] + "-" + (date_parts[1].length === 1 ? "0" + date_parts[1] : date_parts[1]) + "-" + (date_parts[2].length === 1 ? "0" + date_parts[2] : date_parts[2])
+
+                document.getElementById('currentDate').value = newDate;
+
+                var waiter = params[1].replace('w=','');
+                var options = document.getElementById('waiters').options;
+                
+                for(var i = 0; i < options.length; i++){
+                    if(options[i].id === waiter){
+                        document.getElementById('waiters').selectedIndex = i;
+                        break;        
+                    }
+                }
+                
+            });
         </script>
     </head>
     <body>
@@ -94,9 +139,8 @@
                 </select>
                 <input type="button" value="Отчет" onclick="getReport()" />
             </div>
-            <h1>Отчет за деня: {{today}}</h1>
             <div class="orders">
-                <h3>Поръчки за ден</h3>
+                <h3>Поръчки за деня: {{today}}</h3>
                 <table>
                     <tr>
                         <th>
@@ -109,7 +153,13 @@
                             Статус
                         </th>
                         <th>
+                            Отстъпка
+                        </th>
+                        <th>
                             Сметка
+                        </th>
+                        <th>
+                            Артикули
                         </th>
                     </tr>
                     {% for order in orders %}
@@ -128,7 +178,19 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {{ order.total }} лв.
+                                {{ order.discount }} %
+                            </td>
+                            <td>
+                                {{ order.total }} лв. / {{order.total2}}
+                            </td>
+                            <td>
+                                <ul>
+                                {% for orderItem in order.orderItems %}
+                                    <li>
+                                        {{orderItem.product}} ( {{orderItem.quantity}} бр., {{orderItem.reduced}} изв.)
+                                    </li>
+                                {% endfor %}            
+                                </ul>
                             </td>
                         </tr>
                     {% endfor %}
