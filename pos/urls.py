@@ -14,10 +14,10 @@ router.register(r'employees', views.EmployeeViewSet)
 router.register(r'users', views.UserViewSet)
 router.register(r'groups', views.GroupViewSet)
 router.register(r'tables', views.TableViewSet)
-router.register(r'categories', views.CategoryViewSet)
-router.register(r'products', views.ProductViewSet)
+router.register(r'api/categories', views.CategoryViewSet)
+router.register(r'api/products', views.ProductViewSet)
 router.register(r'orders', views.OrderViewSet)
-router.register(r'orderitem', views.OrderItemViewSet)
+router.register(r'api/orderitems', views.OrderItemViewSet)
 
 urlpatterns = patterns('',
     # Examples:
@@ -30,15 +30,17 @@ urlpatterns = patterns('',
     url(r'^test_app/', views.test_app, name='test_app'),
 
     url(r'^auth/', views.auth, name='auth'),
-    url(r'^pos-op/', views.pos_op, name='pos-op'),
 
+    url(r'^pos-op/', views.pos_op, name='pos-op'),
     url(r'^kitchen/', views.kitchen, name='kitchen'),
-    url(r'^skara/', views.skara, name='skara'),    
+    url(r'^skara/', views.skara, name='skara'),
     url(r'^bar/', views.bar, name='bar'),
+
     url(r'^admin/report/', views.report, name='report'),
     url(r'^admin/report-csv/', views.report_csv, name='report_csv'),
     url(r'^report-service/', views.report_service, name='report_service'),
     url(r'^report-waiter/', views.report_waiter, name='report_waiter'),
+    url(r'^report_all/', views.report_all, name="report_all"),
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT, 'show_indexes': True}),

@@ -26,9 +26,11 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'openedBy', 'total','discount','closed', 'reported')
+    list_filter = ('openedBy', 'closed', 'reported')
 
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('addedBy','product','quantity','tableName','changed',)
+    list_filter = ('addedBy', 'changed', 'product')
 
 # Define an inline admin descriptor for Employee model
 # which acts a bit like a singleton

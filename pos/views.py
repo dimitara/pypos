@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 from django.contrib.auth.models import User, Group
 from pos.models import Table, Product, Category, Employee, Order, OrderItem
 
@@ -27,11 +27,11 @@ except:
 """
 class AuthView(APIView):
     authentication_classes = (QuietBasicAuthentication,)
- 
+
     def post(self, request, *args, **kwargs):
         login(request, request.user)
         return Response(UserSerializer(request.user).data)
- 
+
     def delete(self, request, *args, **kwargs):
         logout(request)
         return Response({})
@@ -91,7 +91,7 @@ class OrderItemViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows products to be viewed or edited.
     """
-    queryset = OrderItem.objects.filter(order__status=False)
+    queryset = OrderItem.objects.all()
     serializer_class = OrderItemSerializer
 
 def pos(request):
@@ -122,7 +122,7 @@ def report(request):
 
     d_from = d_from + timedelta(hours=9)
     d_to = d_from + timedelta(hours=24)
-    
+
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
 
     total2 = 0
@@ -134,7 +134,7 @@ def report(request):
 
     items = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to)
     orderItems = items.values('product__name', 'product__description', 'product__price').annotate(dcount=Sum('quantity'))
-    
+
     total = 0
     discounts = 0
     for o in orders:
@@ -145,7 +145,7 @@ def report(request):
             discounts += o.total/perc - o.total
 
     print total2, total
-    
+
     c = template.RequestContext(request, {
         'today' : d_from.strftime('%d-%m-%Y'),
         'orders' : orders,
@@ -167,7 +167,7 @@ def report_service(request):
 
     d_from = d_from + timedelta(hours=9)
     d_to = d_from + timedelta(hours=24)
-    
+
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
     orders = orders.filter(operatedBy=w).order_by('closed')
 
@@ -181,7 +181,7 @@ def report_service(request):
 
 
     #orderItems = models.get_model('pos', 'OrderItem').objects.all().filter(changed__gt=d_from).filter(changed__lt=d_to).values('product__name', 'product__price').annotate(dcount=Count('product__name'))
-    
+
     waiters = models.get_model('auth', 'user').objects.all()
 
     total = 0
@@ -201,12 +201,12 @@ def report_service(request):
         'waiters' : waiters
     })
 
-    return render_to_response(['pos/report_service.html'], c)    
+    return render_to_response(['pos/report_service.html'], c)
 
 def report_waiter(request):
     w = None
-    
-    if request.GET.has_key('w'):    
+
+    if request.GET.has_key('w'):
         w = request.GET['w']
 
     if w == None: return render(request, 'pos/empty.html')
@@ -214,11 +214,11 @@ def report_waiter(request):
     orders = models.get_model('pos', 'Order').objects.all()
     orders = orders.filter(operatedBy=w).filter(reported=False)
 
-    waiter = models.get_model('auth', 'user').objects.all().get(id=int(w))    
-    
+    waiter = models.get_model('auth', 'user').objects.all().get(id=int(w))
+
     total = 0
     for o in orders:
-        if o.status == False: 
+        if o.status == False:
             return render(request, 'pos/error.html')
         total += o.total
 
@@ -238,6 +238,34 @@ def report_waiter(request):
 
     return render(request, 'pos/empty.html')
 
+def report_all(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="report_products.csv"'
+    writer = csv.writer(response)
+    writer.writerow([u'Продукт'.encode('utf-8', 'ignore'), u'Общо продадени'.encode('utf-8', 'ignore'), u'Единична Цена'.encode('utf-8', 'ignore'), u'Общо Цена'.encode('utf-8', 'ignore')])
+
+
+    products = models.get_model('pos', 'Product').objects.all();
+    for product in products:
+        orderitems = models.get_model('pos', 'OrderItem').objects.filter(product=product)
+        sum = 0
+        price = 0
+        for orderitem in orderitems:
+            sum = sum + orderitem.quantity
+            price = price + orderitem.quantity*product.price
+
+        product.orderCount = sum
+        product.totalPrice = price
+
+        name = product.name.encode('utf-8', 'ignore')
+
+        writer.writerow([name, sum, product.price, price])
+
+
+    return response
+
+
+
 def report_csv(request):
     d_from = datetime.now()
     if request.GET.has_key('date'):
@@ -255,9 +283,9 @@ def report_csv(request):
 
     writer = csv.writer(response)
     writer.writerow([u'Item', u'Count', u'Price'])
-    
+
     for oi in orderItems:
-        product = oi['product__name'].encode('utf-8', 'ignore') 
+        product = oi['product__name'].encode('utf-8', 'ignore')
         if oi['product__description'] != None and len(oi['product__description']) > 0:
             product += '-' + oi['product__description'].encode('utf-8', 'ignore')
         writer.writerow([product, oi['dcount'], oi['product__price']])
@@ -266,7 +294,7 @@ def report_csv(request):
 
 
     orders = models.get_model('pos', 'Order').objects.all().filter(closed__gt=d_from).filter(closed__lt=d_to)
-        
+
     total = 0
     discounts = 0
     for o in orders:

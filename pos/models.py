@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 from django.utils.timezone import utc
 import pytz
@@ -72,7 +72,6 @@ class Category(models.Model):
         verbose_name = u'Категория'
         verbose_name_plural = u'Категории'
 
-
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.CharField(max_length=500, blank=True, null=True)
@@ -104,7 +103,7 @@ class Order(models.Model):
     discount = models.DecimalField(decimal_places=2, max_digits=10, default=0)
     discountReason = models.CharField(max_length=500, blank=True, null=True)
     notes = models.CharField(max_length=500, blank=True, null=True)
-    
+
     started = models.DateTimeField(auto_now=True)
     closed = models.DateTimeField(blank=True, null=True)
     status = models.BooleanField()
@@ -227,7 +226,7 @@ class OrderItem(models.Model):
         if(self.changed):
             retVal += " / " + datetime.strftime(self.changed, "%Y-%m-%d %H:%M")
             return retVal
-        
+
         return retVal + u" / не е обработена"
 
     class Meta:
