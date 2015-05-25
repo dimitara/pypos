@@ -173,6 +173,7 @@ class OrderItem(models.Model):
     comment = models.CharField(max_length=500, blank=True, null=True)
     cooked = models.BooleanField(default=False)
     reduced = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(decimal_places=2, max_digits=10)
 
     def save(self, *args, **kwargs):
         if not self.id:

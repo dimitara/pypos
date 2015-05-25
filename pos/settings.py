@@ -73,7 +73,7 @@ STATIC_URL = '/static/'
 WSGI_APPLICATION = 'pos.wsgi.application'
 
 TEMPLATE_DIRS = (
-    BASE_DIR + 'pos/templates/'
+    BASE_DIR + 'pos/templates/',
 )
 
 # Database
@@ -93,7 +93,7 @@ DATABASES = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'bg-bg'
 
 TIME_ZONE = 'UTC'
 

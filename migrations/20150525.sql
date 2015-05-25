@@ -1,0 +1,1 @@
+ALTER TABLE pos_orderitem ADD COLUMN price decimal(10,2) set default 0;

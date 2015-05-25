@@ -10,13 +10,13 @@ import pos.views as views
 #from pos.backend import Backend as pos_login
 
 router = routers.DefaultRouter()
-router.register(r'employees', views.EmployeeViewSet)
-router.register(r'users', views.UserViewSet)
-router.register(r'groups', views.GroupViewSet)
-router.register(r'tables', views.TableViewSet)
+router.register(r'api/employees', views.EmployeeViewSet)
+router.register(r'api/users', views.UserViewSet)
+router.register(r'api/groups', views.GroupViewSet)
+router.register(r'api/tables', views.TableViewSet)
 router.register(r'api/categories', views.CategoryViewSet)
 router.register(r'api/products', views.ProductViewSet)
-router.register(r'orders', views.OrderViewSet)
+router.register(r'api/orders', views.OrderViewSet)
 router.register(r'api/orderitems', views.OrderItemViewSet)
 
 urlpatterns = patterns('',
