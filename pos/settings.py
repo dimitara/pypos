@@ -27,32 +27,40 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
-#AUTHENTICATION_BACKENDS = ( 
-#    'pos.authentication.POSAuthentication', 
+#AUTHENTICATION_BACKENDS = (
+#    'pos.authentication.POSAuthentication',
 #)
 
 
 # Application definition
 
 INSTALLED_APPS = (
+    'djangocms_admin_style',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    #'django.contrib.staticfiles',
+    'django.contrib.staticfiles',
     'pos',
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
 )
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+)
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = (
+    'localhost:4200'
 )
 
 ROOT_URLCONF = 'pos.urls'
@@ -74,9 +82,9 @@ TEMPLATE_DIRS = (
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'pos_db2',
-        'USER': 'dim',
-        'PASSWORD': 'clAmp',
+        'NAME': 'pos_db',
+        'USER': 'pos_web',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': ''
     }
@@ -97,14 +105,9 @@ USE_TZ = True
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAdminUser',),
-    'PAGINATE_BY': 200,
-
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-        #'pos.authentication.BasicAuthentication',
-        #'pos.authentication.POSAuthentication', 
-    ),
+    'DEFAULT_PERMISSION_CLASSES': (),
+    'PAGINATE_BY': 1000,
+    'DEFAULT_AUTHENTICATION_CLASSES': (),
 }
 
 # Parse database configuration from $DATABASE_URL
@@ -115,3 +118,9 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # Allow all host headers
 ALLOWED_HOSTS = ['*']
+
+"""
+TEMPLATE_CONTEXT_PROCESSORS = (
+    "django.contrib.auth.context_processors.auth",
+    "django.core.context_processors.request",
+)"""
